@@ -82,7 +82,7 @@ gen:
 
 #### 命令行
 
-- 下载代码生成工具：https://github.com/okgotool/gocodegen/release/gocodegen-latest.zip
+- 下载代码生成工具：https://github.com/okgotool/gocodegen/releases/download/v0.0.1/gocodegen-0.0.1.zip
 - 解压到目录，如：./cmd/gen 下面
 - 创建代码生成配置文件，如： ./gen_example.yaml
 - 执行：
