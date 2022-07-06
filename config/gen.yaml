@@ -1,0 +1,66 @@
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  user: root
+  password: passwd
+  database: ai_iotman
+  conn: charset=utf8mb4&parseTime=True
+gen:
+  dmlFolder: ./db_dml
+  runDml: 
+    enable: true
+  genVue:
+    enable: true
+    vueProjectRoot: ./example
+  genApi: 
+    enable: true
+    overWrite: true
+    apiGroup: v1
+    genApis:
+      - QueryAll
+      - QueryByCondition
+      - CreateBatch
+      - Create
+      - UpdateBatch
+      - Update
+      - Remove 
+    excludeModelFieldsForQueryParameters:
+      - deleted
+      - updated_at
+    excludeModelFieldsForResponse:
+      - deleted
+  genBiz: 
+    enable: true
+    overWrite: true
+  genDataSource: 
+    enable: true
+    overWrite: false
+  genDal: 
+    enable: true
+    overWrite: true
+  dataSources:
+    - dataSourceName: db1
+      dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True
+      # code: app.AlertDB
+  genTables:
+    - tableName: sys_role
+      genApis:
+        - QueryAll
+        - QueryByCondition
+        - CreateBatch
+        - Create
+        - UpdateBatch
+        - Update
+        - Remove 
+    - tableName: test_cat
+      dataSourceName: db1
+      fields:
+        - columnName: id
+          fieldName: Id
+          fieldType: int64
+        - columnName: cat_name
+          fieldName: NewFieldName
+        - columnName: lastmodified
+          isIgnore: false
+  outputRoot: ./example
+  packageRoot: github.com/okgotool/gocodegen/example

@@ -1,0 +1,18 @@
+
+// 软删除，设置deleted字段为1，只有有deleted字段才支持
+// 参数：id，多个时逗号隔开
+export function roftRemove{TableModelName}(query) {
+  return request({
+    url: '/api/v1/{TableModelNameLowCase}s/soft',
+    method: 'delete',
+    params: query
+  })
+}
+
+// 清除已被软删除的记录，即删除deleted字段为1的所有记录，只有有deleted字段才支持
+export function clean{TableModelName}() {
+  return request({
+    url: '/api/v1/{TableModelNameLowCase}s/clean',
+    method: 'delete'
+  })
+}

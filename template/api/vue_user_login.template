@@ -1,0 +1,164 @@
+package api
+
+import (
+	"strings"
+
+	"aitech.com/iotman/biz"
+	"aitech.com/iotman/model/request"
+	"aitech.com/iotman/model/response"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gen/field"
+)
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary vue 用户登录
+// @Schemes
+// @Description vue admin 用户登录，返回token
+// @Tags SysUser
+// @Param body body request.VueUserLogin{} true "json format" default({\"username\":admin,\"password\":\"111111\"})
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.VueLoginResponse "{\"token\":\"admin-token\"}"
+// @Failure 400 {object} response.VueLoginFailedResponse "{\"code\":400,\"msg\":\"登录失败\"}"
+// @Router /api/v1/user/login [post]
+// @Security ApiKeyAuth
+func (c *SysUserApiType) VueLogin(g *gin.Context) {
+
+	model := &request.VueUserLogin{}
+
+	err := g.ShouldBind(model)
+	if err != nil {
+		g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误",
+		})
+		return
+	}
+
+	whereConditions := []field.Expr{
+		biz.SysUserDao.LoginAccount.Eq(model.UserName),
+	}
+	rs, err := biz.SysUserService.QueryAll(whereConditions, nil, 1, 1)
+
+	if err != nil {
+		g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+			Code: response.StatusInternalServerError,
+			Msg:  "登录失败",
+		})
+		return
+	} else if len(rs) < 1 {
+		g.JSON(int(response.StatusBadRequest), &response.VueLoginFailedResponse{
+			Code: response.StatusBadRequest,
+			Msg:  "用户不存在",
+		})
+		return
+	} else {
+		user := rs[0]
+		if !biz.IsPasswordRight(user.LoginPwd, model.Password) {
+			g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+				Code: response.StatusBadRequest,
+				Msg:  "密码错误",
+			})
+			return
+		} else {
+			tokenPair := map[string]interface{}{
+				"userId":       user.ID,
+				"name":         user.LoginAccount,
+				"roles":        user.Roles,
+				"introduction": user.Comment,
+				"avatar":       user.Avatar,
+			}
+
+			token, err := biz.CreateToken(tokenPair)
+			if err != nil {
+				g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+					Code: response.StatusInternalServerError,
+					Msg:  "Token创建失败",
+				})
+				return
+			} else {
+				g.JSON(response.OKCode, &response.VueLoginResponse{
+					Code: response.StatusOK,
+					Data: &response.VueLoginResponseData{
+						Token: token,
+					},
+				})
+			}
+		}
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary vue 获取token的用户信息
+// @Schemes
+// @Description vue 获取token的用户信息
+// @Tags SysUser
+// @Param token query string true "token" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.VueGetUserInfoResponse "{\"name\":200,\"roles\":\"ok\",\"introduction\":\"\",\"avatar\":\"\""}"
+// @Failure 210 {object} response.VueLoginFailedResponse "{\"code\":400,\"msg\":\"token内容错误\"}"
+// @Router /api/v1/user/info [get]
+// @Security ApiKeyAuth
+func (c *SysUserApiType) VueGetTokenUserInfo(g *gin.Context) {
+
+	token := g.Query("token")
+
+	if len(token) < 1 {
+		g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+			Code: response.StatusBadRequest,
+			Msg:  "缺少Token参数",
+		})
+		return
+	}
+
+	tokenPair, err := biz.DecodeToken(token)
+
+	if err != nil {
+		g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+			Code: response.StatusBadRequest,
+			Msg:  "Token格式错误",
+		})
+		return
+	} else {
+		userName, hasName := tokenPair["name"]
+		roles := tokenPair["roles"]
+		introduction := tokenPair["introduction"]
+		avatar := tokenPair["avatar"]
+
+		if !hasName || len(roles.(string)) < 1 {
+			g.JSON(response.OKCode, &response.VueLoginFailedResponse{
+				Code: response.StatusBadRequest,
+				Msg:  "Token没有用户或角色信息",
+			})
+			return
+		} else {
+			g.JSON(response.OKCode, &response.VueGetUserInfoResponse{
+				Code: response.StatusOK,
+				Data: &response.VueGetUserInfoData{
+					Name:         userName.(string),
+					Roles:        strings.Split(roles.(string), ","),
+					Introduction: introduction.(string),
+					Avatar:       avatar.(string),
+				},
+			})
+		}
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary vue logout退出登录
+// @Schemes
+// @Description vue logout退出登录
+// @Tags SysUser
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.VueLogout "{\"code\":20000,\"data\":\"success\"}"
+// @Router /api/v1/user/logout [post]
+// @Security ApiKeyAuth
+func (c *SysUserApiType) VueLogout(g *gin.Context) {
+	g.JSON(response.OKCode, &response.VueLogout{
+		Code: 200,
+		Data: "success",
+	})
+}

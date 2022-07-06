@@ -1,0 +1,49 @@
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 查询所有，支持分页、排序
+// @Schemes
+// @Description 查询所有，支持分页、排序
+// @Tags {TableModelName}
+// @Param orderBy query string false "orderBy" default()
+// @Param page query int false "page" default(1)
+// @Param pageSize query int false "pageSize" default(10)
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Success{TableModelName}Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数错误\"}"
+// @Router /api/v1/{TableModelNameLowCase}s/all [get]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) QueryAll(g *gin.Context) {
+	page, pageSize, errMsgs := getPagerValuesFromQuery(g)
+
+	orderBy := g.Query("orderBy")
+	orderBys, err := biz.{TableModelName}Service.GetOrderByExpr(orderBy)
+	if err != nil {
+		errMsgs["orderBy"] = err.Error()
+	}
+
+	if len(errMsgs) > 0 {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数错误",
+			Data: errMsgs,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.QueryAll(nil, orderBys, page, pageSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.Success{TableModelName}Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: rs,
+		})
+	}
+}

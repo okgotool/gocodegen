@@ -1,0 +1,41 @@
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 更新一个
+// @Schemes
+// @Description 更新一个，返回被修改的行数
+// @Tags {TableModelName}
+// @Param body body model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误\"}"
+// @Router /api/v1/{TableModelNameLowCase} [put]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) Update(g *gin.Context) {
+	model := &model.{TableModelName}{}
+
+	err := g.ShouldBind(model)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	}
+
+	effectRows, err := biz.{TableModelName}Service.Update(model)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: effectRows,
+		})
+	}
+}

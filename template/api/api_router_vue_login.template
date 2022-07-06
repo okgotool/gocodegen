@@ -1,0 +1,10 @@
+
+// addVueLoginApis
+func addVueLoginApis(v1 *gin.RouterGroup) {
+	// 登录：
+	v1.POST("/user/login", SysUserApi.VueLogin)
+	// 获取token的用户信息：
+	v1.GET("/user/info", SysUserApi.VueGetTokenUserInfo)
+	// 登出
+	v1.POST("/user/logout", SysUserApi.VueLogout)
+}

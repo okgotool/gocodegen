@@ -1,0 +1,17 @@
+
+// 软删除，设置deleted=1，成功返回影响的行数, 有deleted字段时才有该方法
+func (c *{TableModelName}ServiceType) SoftDelete(ids []int64) (int64, error) {
+	if len(ids) < 1 {
+		return 0, errors.New("ID not giving!")
+	}
+	info, err := {TableModelName}Dao.WithContext(dal.QueryCtx).Where({TableModelName}Dao.ID.In(ids...)).UpdateColumn({TableModelName}Dao.Deleted, true)
+
+	return info.RowsAffected, err
+}
+
+// 清除已软删除的记录，成功返回影响的行数, 有deleted字段时才有该方法
+func (c *{TableModelName}ServiceType) Clean() (int64, error) {
+	info, err := {TableModelName}Dao.WithContext(dal.QueryCtx).Where({TableModelName}Dao.Deleted).Delete()
+
+	return info.RowsAffected, err
+}

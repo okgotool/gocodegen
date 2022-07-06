@@ -1,0 +1,27 @@
+// add{TableModelName}Apis
+func add{TableModelName}Apis(v1 *gin.RouterGroup) {
+    // 查询：
+    v1.GET("/{TableModelNameLowCase}s/all", {TableModelName}Api.QueryAll)
+    v1.GET("/{TableModelNameLowCase}s", {TableModelName}Api.QueryByCondition)
+ 
+    // 创建:
+    v1.POST("/{TableModelNameLowCase}s", {TableModelName}Api.CreateBatch)
+    v1.POST("/{TableModelNameLowCase}", {TableModelName}Api.Create)
+ 
+    // 修改:
+    v1.PUT("/{TableModelNameLowCase}s", {TableModelName}Api.UpdateBatch)
+    v1.PUT("/{TableModelNameLowCase}", {TableModelName}Api.Update)
+ 
+    // 删除:
+    v1.DELETE("/{TableModelNameLowCase}s", {TableModelName}Api.Remove)
+    
+    //// hasDeletedColumn start
+
+	// 软删除
+	v1.DELETE("/{TableModelNameLowCase}s/soft", {TableModelName}Api.SoftRemove)
+	// 清除软删除记录
+	v1.DELETE("/{TableModelNameLowCase}s/clean", {TableModelName}Api.Clean)
+
+    //// hasDeletedColumn end
+
+}

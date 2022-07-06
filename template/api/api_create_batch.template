@@ -1,0 +1,57 @@
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 批量创建
+// @Schemes
+// @Description 批量创建，返回新创建的记录的ID列表
+// @Tags {TableModelName}
+// @Param body body []model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误或为空\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [post]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) CreateBatch(g *gin.Context) {
+	newIds := []int64{}
+	models := []*model.{TableModelName}{}
+
+	err := g.ShouldBind(models)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误或为空",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	} else if len(models) < 1 {
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: newIds,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.CreateBatch(models, {TableModelName}InstertBatchSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+        for _, model := range rs {
+            if model.ID > 0 {
+                newIds = append(newIds, model.ID)
+            }
+        }
+
+        // 返回新创建的记录的ID列表
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: newIds,
+		})
+	}
+}

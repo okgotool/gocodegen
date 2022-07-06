@@ -1,0 +1,387 @@
+package api
+
+import (
+	"strconv"
+	"strings"
+	"time"
+
+	"{GenPackageRoot}/biz"
+	"{GenPackageRoot}/dal/model"
+	"{GenPackageRoot}/model/response"
+	"github.com/gin-gonic/gin"
+	"gorm.io/gen/field"
+)
+
+var (
+	{TableModelName}Api = &{TableModelName}ApiType{}
+
+	{TableModelName}InsertBatchSize = 100
+)
+
+type {TableModelName}ApiType struct {
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 查询所有，支持分页、排序
+// @Schemes
+// @Description 查询所有，支持分页、排序
+// @Tags {TableModelName}
+// @Param orderBy query string false "orderBy" default()
+// @Param page query int false "page" default(1)
+// @Param pageSize query int false "pageSize" default(10)
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Success{TableModelName}Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数错误\"}"
+// @Router /api/v1/{TableModelNameLowCase}s/all [get]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) QueryAll(g *gin.Context) {
+	page, pageSize, errMsgs := getPagerValuesFromQuery(g)
+
+	orderBy := g.Query("orderBy")
+	orderBys, err := biz.{TableModelName}Service.GetOrderByExpr(orderBy)
+	if err != nil {
+		errMsgs["orderBy"] = err.Error()
+	}
+
+	if len(errMsgs) > 0 {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数错误",
+			Data: errMsgs,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.QueryAll(nil, orderBys, page, pageSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.Success{TableModelName}Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: rs,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 条件查询，支持分页、排序
+// @Schemes
+// @Description 条件查询，支持分页、排序
+// @Tags {TableModelName}
+// @Param id query int false "id" default()
+{ParameterQuerySwaggerParameters}// @Param orderBy query string false "orderBy" default()
+// @Param page query int false "page" default(1)
+// @Param pageSize query int false "pageSize" default(10)
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Success{TableModelName}Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数错误\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [get]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
+	idStr := g.Query("id")
+
+	whereConditions := []field.Expr{}
+	page, pageSize, errMsgs := getPagerValuesFromQuery(g)
+
+	orderBy := g.Query("orderBy")
+	orderBys, err := biz.{TableModelName}Service.GetOrderByExpr(orderBy)
+	if err != nil {
+		errMsgs["orderBy"] = err.Error()
+	}
+
+	if len(idStr) > 0 && !strings.EqualFold(idStr, "0") { // 按id查询
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			errMsgs["id"] = err.Error()
+		} else {
+			whereConditions = append(whereConditions, biz.{TableModelName}Dao.ID.Eq(id))
+		}
+	} else { // 多条件查询
+
+		// 其它查询条件处理：
+{ParameterQueryConditions}
+
+	}
+
+	if len(errMsgs) > 0 {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数错误",
+			Data: errMsgs,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.QueryAll(whereConditions, orderBys, page, pageSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.Success{TableModelName}Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: rs,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 批量创建
+// @Schemes
+// @Description 批量创建，返回新创建的记录的ID列表
+// @Tags {TableModelName}
+// @Param body body []model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误或为空\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [post]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) CreateBatch(g *gin.Context) {
+	newIds := []int64{}
+	models := []*model.{TableModelName}{}
+
+	err := g.ShouldBind(&models)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误或为空",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	} else if len(models) < 1 {
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: newIds,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.CreateBatch(models, {TableModelName}InsertBatchSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+        for _, model := range rs {
+            if model.ID > 0 {
+                newIds = append(newIds, model.ID)
+            }
+        }
+
+        // 返回新创建的记录的ID列表
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: newIds,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 创建一个
+// @Schemes
+// @Description 创建一个，返回创建的记录的ID
+// @Tags {TableModelName}
+// @Param body body model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误\"}"
+// @Router /api/v1/{TableModelNameLowCase} [post]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) Create(g *gin.Context) {
+
+	model := &model.{TableModelName}{}
+
+	err := g.ShouldBind(model)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.Create(model)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: rs.ID,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 批量更新
+// @Schemes
+// @Description 批量更新，返回被修改的行数
+// @Tags {TableModelName}
+// @Param body body []model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误或为空\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [put]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) UpdateBatch(g *gin.Context) {
+	models := []*model.{TableModelName}{}
+
+	err := g.ShouldBind(&models)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误或为空",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	} else if len(models) < 1 {
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: []int64{},
+		})
+		return
+	}
+
+	effectRows, err := biz.{TableModelName}Service.UpdateBatch(models)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: effectRows,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 更新一个
+// @Schemes
+// @Description 更新一个，返回被修改的行数
+// @Tags {TableModelName}
+// @Param body body model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误\"}"
+// @Router /api/v1/{TableModelNameLowCase} [put]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) Update(g *gin.Context) {
+	model := &model.{TableModelName}{}
+
+	err := g.ShouldBind(model)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	}
+
+	effectRows, err := biz.{TableModelName}Service.Update(model)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: effectRows,
+		})
+	}
+}
+
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 硬删除，删除记录，不可找回
+// @Schemes
+// @Description 硬删除，删除记录，不可找回，可以传多个id，逗号隔开，返回被删除的行数
+// @Tags {TableModelName}
+// @Param id query string true "id，多个时逗号隔开" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [delete]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) Remove(g *gin.Context) {
+
+	idStr := g.Query("id")
+	idStrs := strings.Split(idStr, ",")
+	ids := []int64{}
+
+	for _, idStr := range idStrs {
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误",
+			Data: map[string]string{"error": err.Error()},
+		    })
+			return
+		}
+
+		ids = append(ids, id)
+	}
+    if len(ids) < 1 {
+        g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: 0,
+		})
+        return
+    }
+
+	effectRows, err := biz.{TableModelName}Service.Delete(ids)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: effectRows,
+		})
+	}
+}
+

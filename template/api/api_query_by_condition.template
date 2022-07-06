@@ -1,0 +1,66 @@
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 条件查询，支持分页、排序
+// @Schemes
+// @Description 条件查询，支持分页、排序
+// @Tags {TableModelName}
+// @Param id query int false "id" default()
+{ParameterQuerySwaggerParameters}// @Param orderBy query string false "orderBy" default()
+// @Param page query int false "page" default(1)
+// @Param pageSize query int false "pageSize" default(10)
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Success{TableModelName}Array "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数错误\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [get]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
+	idStr := g.Query("id")
+
+	whereConditions := []field.Expr{}
+	page, pageSize, errMsgs := getPagerValuesFromQuery(g)
+
+	orderBy := g.Query("orderBy")
+	orderBys, err := biz.{TableModelName}Service.GetOrderByExpr(orderBy)
+	if err != nil {
+		errMsgs["orderBy"] = err.Error()
+	}
+
+	if len(idStr) > 0 && !strings.EqualFold(idStr, "0") { // 按id查询
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			errMsgs["id"] = err.Error()
+		} else {
+			whereConditions = append(whereConditions, biz.{TableModelName}Dao.ID.Eq(id))
+		}
+	} else { // 多条件查询
+
+		// 其它查询条件处理：
+{ParameterQueryConditions}
+
+	}
+
+	if len(errMsgs) > 0 {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数错误",
+			Data: errMsgs,
+		})
+		return
+	}
+
+	rs, err := biz.{TableModelName}Service.QueryAll(whereConditions, orderBys, page, pageSize)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.Success{TableModelName}Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: rs,
+		})
+	}
+}

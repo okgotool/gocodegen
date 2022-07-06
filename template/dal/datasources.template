@@ -1,0 +1,27 @@
+package dal
+
+import (
+	"fmt"
+	// {GenDataSourcesImports}
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+var (
+	// {GenDataSources}
+)
+
+func ConnectDB(dsn string) (db *gorm.DB) {
+	conn, err := gorm.Open(mysql.Open(dsn))
+
+	if err != nil {
+		panic(fmt.Errorf("connect db fail: %w", err))
+	}
+
+	return conn
+}
+
+func CreateDbConn(modelName string) *gorm.DB {
+	// {GenGetDataSourceByModelName}
+}

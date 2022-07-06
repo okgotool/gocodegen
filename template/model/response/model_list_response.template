@@ -1,0 +1,13 @@
+package response
+
+import (
+	"{GenPackageRoot}/dal/model"
+)
+
+type (
+	Success{TableModelName}Array struct {
+		Code StatusCode       `json:"code"`
+		Msg  string           `json:"msg"`
+		Data []*model.{TableModelName} `json:"data"`
+	}
+)

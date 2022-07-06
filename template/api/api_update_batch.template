@@ -1,0 +1,48 @@
+// Swagger doc refer: https://github.com/swaggo/swag
+// @Summary 批量更新
+// @Schemes
+// @Description 批量更新，返回被修改的行数
+// @Tags {TableModelName}
+// @Param body body []model.{TableModelName}{} true "json format" default()
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
+// @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数格式错误或为空\"}"
+// @Router /api/v1/{TableModelNameLowCase}s [put]
+// @Security ApiKeyAuth
+func (c *{TableModelName}ApiType) UpdateBatch(g *gin.Context) {
+	models := []*model.{TableModelName}{}
+
+	err := g.ShouldBind(models)
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code: response.StatusBadRequest,
+			Msg:  "参数格式错误或为空",
+			Data: map[string]string{"error": err.Error()},
+		})
+		return
+	} else if len(models) < 1 {
+		g.JSON(response.OKCode, &response.SuccessInt64Array{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: []int64{},
+		})
+		return
+	}
+
+	effectRows, err := biz.{TableModelName}Service.UpdateBatch(models)
+
+	if err != nil {
+		g.JSON(response.FailedCode, &response.FailedWithReason{
+			Code:  response.StatusInternalServerError,
+			Msg:   "执行失败",
+			Data: map[string]string{"error": err.Error()},
+		})
+	} else {
+		g.JSON(response.OKCode, &response.SuccessInt64{
+			Code: response.StatusOK,
+			Msg:  "ok",
+			Data: effectRows,
+		})
+	}
+}
