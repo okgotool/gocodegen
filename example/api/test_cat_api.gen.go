@@ -78,9 +78,11 @@ func (c *TestCatApiType) QueryAll(g *gin.Context) {
 // @Param id query int false "id" default()
 // @Param catName query string false "CatName" default()
 // @Param createdBy query string false "CreatedBy" default()
-// @Param createdAt query int64 false "CreatedAt, 毫秒数时间戳，查询大于等于该时间的数据" default()
+// @Param createdAtMin query int64 false "CreatedAt 起始时间, 毫秒数时间戳，查询大于等于createdAtMin 该时间的数据" default()
+// @Param createdAtMax query int64 false "CreatedAt 结束时间, 毫秒数时间戳，查询小于createdAtMax 该时间的数据" default()
 // @Param updatedBy query string false "UpdatedBy" default()
-// @Param updatedAt query int64 false "UpdatedAt, 毫秒数时间戳，查询大于等于该时间的数据" default()
+// @Param updatedAtMin query int64 false "UpdatedAt 起始时间, 毫秒数时间戳，查询大于等于updatedAtMin 该时间的数据" default()
+// @Param updatedAtMax query int64 false "UpdatedAt 结束时间, 毫秒数时间戳，查询小于updatedAtMax 该时间的数据" default()
 // @Param orderBy query string false "orderBy" default()
 // @Param page query int false "page" default(1)
 // @Param pageSize query int false "pageSize" default(10)
@@ -120,24 +122,44 @@ func (c *TestCatApiType) QueryByCondition(g *gin.Context) {
 			queryValue := g.Query("createdBy")
 			whereConditions = append(whereConditions, biz.TestCatDao.CreatedBy.Eq(queryValue))
 		}
-		if len(g.Query("createdAt")) > 0 {
-			createdAtMills, err := strconv.ParseInt(g.Query("createdAt"), 10, 64)
+
+		// query data of createdAt between createdAtMin and createdAtMax:
+		if len(g.Query("createdAtMin")) > 0 {
+			createdAtMills, err := strconv.ParseInt(g.Query("createdAtMin"), 10, 64)
 			if err == nil {
-				createdAt := time.Unix(createdAtMills/1000, 0)
-				whereConditions = append(whereConditions, biz.TestCatDao.CreatedAt.Gte(createdAt))
+				createdAtMin := time.Unix(createdAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.TestCatDao.CreatedAt.Gte(createdAtMin))
 			}
 		}
+		if len(g.Query("createdAtMax")) > 0 {
+			createdAtMills, err := strconv.ParseInt(g.Query("createdAt"), 10, 64)
+			if err == nil {
+				createdAtMax := time.Unix(createdAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.TestCatDao.CreatedAt.Lt(createdAtMax))
+			}
+		}
+
 		if len(g.Query("updatedBy")) > 0 {
 			queryValue := g.Query("updatedBy")
 			whereConditions = append(whereConditions, biz.TestCatDao.UpdatedBy.Eq(queryValue))
 		}
-		if len(g.Query("updatedAt")) > 0 {
-			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAt"), 10, 64)
+
+		// query data of updatedAt between updatedAtMin and updatedAtMax:
+		if len(g.Query("updatedAtMin")) > 0 {
+			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAtMin"), 10, 64)
 			if err == nil {
-				updatedAt := time.Unix(updatedAtMills/1000, 0)
-				whereConditions = append(whereConditions, biz.TestCatDao.UpdatedAt.Gte(updatedAt))
+				updatedAtMin := time.Unix(updatedAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.TestCatDao.UpdatedAt.Gte(updatedAtMin))
 			}
 		}
+		if len(g.Query("updatedAtMax")) > 0 {
+			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAt"), 10, 64)
+			if err == nil {
+				updatedAtMax := time.Unix(updatedAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.TestCatDao.UpdatedAt.Lt(updatedAtMax))
+			}
+		}
+
 
 
 	}

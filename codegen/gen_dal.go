@@ -2,6 +2,7 @@ package codegen
 
 import (
 	"fmt"
+	"strings"
 
 	"gorm.io/gen"
 	"gorm.io/gorm"
@@ -42,6 +43,9 @@ func GenerateDalCodes(conn *gorm.DB, config *GenConfig) {
 				}
 			}
 
+			// change json format to camel format
+			filedGenOps = append(filedGenOps, gen.FieldJSONTagWithNS(CamelCase))
+
 			// if len(table.ModelName) < 1 {
 			g.ApplyBasic(g.GenerateModel(table.TableName, filedGenOps...))
 			// }
@@ -52,6 +56,26 @@ func GenerateDalCodes(conn *gorm.DB, config *GenConfig) {
 	}
 
 	g.Execute()
+}
+
+// change column to camel format
+func CamelCase(columnName string) (tagContent string) {
+	if len(columnName) < 1 || !strings.Contains(columnName, "_") {
+		return columnName
+	}
+	data := make([]byte, 0, len(columnName))
+	for i := 0; i < len(columnName); i++ {
+		c := columnName[i]
+		if c == '_' {
+			continue
+		}
+		if i > 0 && columnName[i-1] == '_' && c >= 'a' && c <= 'z' {
+			data = append(data, c-32)
+		} else {
+			data = append(data, c)
+		}
+	}
+	return string(data)
 }
 
 func GenerateAutomigrate(config *GenConfig, models []*DbModel) {

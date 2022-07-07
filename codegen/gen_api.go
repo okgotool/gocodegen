@@ -99,16 +99,15 @@ func generateApiMethodCode(config *GenConfig, tableName string, modelName string
 			} else if strings.EqualFold(modelFieldType, "time.Time") {
 				fieldQueryConditions += getApiTimeQueryCondition(paramName, modelName, modelFieldName, modelFieldType)
 
-				swaggerParameters += "// @Param " + paramName + " query int64 false \"" + modelFieldName + ", 毫秒数时间戳，查询大于等于该时间的数据\" default()\n"
+				swaggerParameters += "// @Param " + paramName + "Min query int64 false \"" + modelFieldName + " 起始时间, 毫秒数时间戳，查询大于等于" + paramName + "Min 该时间的数据\" default()\n"
+				swaggerParameters += "// @Param " + paramName + "Max query int64 false \"" + modelFieldName + " 结束时间, 毫秒数时间戳，查询小于" + paramName + "Max 该时间的数据\" default()\n"
 			} else {
 				fmt.Println(" -- Ignore modelFieldName=" + modelFieldName + ", modelFieldType=" + modelFieldType)
 				continue
 			}
 
 			if len(fieldQueryConditions) > 0 {
-				queryConditions += "\t\tif len(g.Query(\"" + paramName + "\")) > 0 {\n"
 				queryConditions += fieldQueryConditions
-				queryConditions += "\t\t}\n"
 			}
 		}
 
@@ -129,14 +128,21 @@ func generateApiMethodCode(config *GenConfig, tableName string, modelName string
 }
 
 func getApiStringQueryCondition(paramName string, modelName string, modelFieldName string) string {
-	str := "\t\t\tqueryValue := g.Query(\"" + paramName + "\")\n"
+	str := "\t\tif len(g.Query(\"" + paramName + "\")) > 0 {\n"
+
+	str += "\t\t\tqueryValue := g.Query(\"" + paramName + "\")\n"
 	str += "\t\t\twhereConditions = append(whereConditions, biz." + modelName + "Dao." + modelFieldName + ".Eq(queryValue))\n"
+
+	str += "\t\t}\n"
 	return str
 }
 
 func getApiIntQueryCondition(paramName string, modelName string, modelFieldName string, fieldType string) string {
 
-	str := "\t\t\tqueryValues := []" + fieldType + "{}\n"
+	str := "\n"
+	str += "\t\tif len(g.Query(\"" + paramName + "\")) > 0 {\n"
+
+	str += "\t\t\tqueryValues := []" + fieldType + "{}\n"
 	str += "\t\t\tqueryStrs := strings.Split(g.Query(\"" + paramName + "\"), \",\")\n"
 	str += "\t\t\tfor _, queryStr := range queryStrs {\n"
 
@@ -156,16 +162,34 @@ func getApiIntQueryCondition(paramName string, modelName string, modelFieldName 
 	str += "\t\t\t\twhereConditions = append(whereConditions, biz." + modelName + "Dao." + modelFieldName + ".In(queryValues...))\n"
 	str += "\t\t\t}\n"
 
+	str += "\t\t}\n"
+	str += "\n"
+
 	return str
 }
 
 func getApiTimeQueryCondition(paramName string, modelName string, modelFieldName string, fieldType string) string {
 
-	str := "\t\t\t" + paramName + "Mills, err := strconv.ParseInt(g.Query(\"" + paramName + "\"), 10, 64)\n"
+	str := "\n"
+	str += "\t\t// query data of " + paramName + " between " + paramName + "Min and " + paramName + "Max:\n"
+
+	str += "\t\tif len(g.Query(\"" + paramName + "Min\")) > 0 {\n"
+	str += "\t\t\t" + paramName + "Mills, err := strconv.ParseInt(g.Query(\"" + paramName + "Min\"), 10, 64)\n"
 	str += "\t\t\tif err == nil {\n"
-	str += "\t\t\t\t" + paramName + " := time.Unix(" + paramName + "Mills/1000, 0)\n"
-	str += "\t\t\t\twhereConditions = append(whereConditions, biz." + modelName + "Dao." + modelFieldName + ".Gte(" + paramName + "))\n"
+	str += "\t\t\t\t" + paramName + "Min := time.Unix(" + paramName + "Mills/1000, 0)\n"
+	str += "\t\t\t\twhereConditions = append(whereConditions, biz." + modelName + "Dao." + modelFieldName + ".Gte(" + paramName + "Min))\n"
 	str += "\t\t\t}\n"
+	str += "\t\t}\n"
+
+	str += "\t\tif len(g.Query(\"" + paramName + "Max\")) > 0 {\n"
+	str += "\t\t\t" + paramName + "Mills, err := strconv.ParseInt(g.Query(\"" + paramName + "\"), 10, 64)\n"
+	str += "\t\t\tif err == nil {\n"
+	str += "\t\t\t\t" + paramName + "Max := time.Unix(" + paramName + "Mills/1000, 0)\n"
+	str += "\t\t\t\twhereConditions = append(whereConditions, biz." + modelName + "Dao." + modelFieldName + ".Lt(" + paramName + "Max))\n"
+	str += "\t\t\t}\n"
+	str += "\t\t}\n"
+
+	str += "\n"
 
 	return str
 }

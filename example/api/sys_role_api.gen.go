@@ -83,12 +83,16 @@ func (c *SysRoleApiType) QueryAll(g *gin.Context) {
 // @Param comment query string false "Comment" default()
 // @Param deleted query string false "Deleted, 数字，多个时逗号隔开" default()
 // @Param lastmodifiedBy query string false "LastmodifiedBy" default()
-// @Param lastmodified query int64 false "Lastmodified, 毫秒数时间戳，查询大于等于该时间的数据" default()
+// @Param lastmodifiedMin query int64 false "Lastmodified 起始时间, 毫秒数时间戳，查询大于等于lastmodifiedMin 该时间的数据" default()
+// @Param lastmodifiedMax query int64 false "Lastmodified 结束时间, 毫秒数时间戳，查询小于lastmodifiedMax 该时间的数据" default()
 // @Param createdBy query string false "CreatedBy" default()
-// @Param created query int64 false "Created, 毫秒数时间戳，查询大于等于该时间的数据" default()
-// @Param createdAt query int64 false "CreatedAt, 毫秒数时间戳，查询大于等于该时间的数据" default()
+// @Param createdMin query int64 false "Created 起始时间, 毫秒数时间戳，查询大于等于createdMin 该时间的数据" default()
+// @Param createdMax query int64 false "Created 结束时间, 毫秒数时间戳，查询小于createdMax 该时间的数据" default()
+// @Param createdAtMin query int64 false "CreatedAt 起始时间, 毫秒数时间戳，查询大于等于createdAtMin 该时间的数据" default()
+// @Param createdAtMax query int64 false "CreatedAt 结束时间, 毫秒数时间戳，查询小于createdAtMax 该时间的数据" default()
 // @Param updatedBy query string false "UpdatedBy" default()
-// @Param updatedAt query int64 false "UpdatedAt, 毫秒数时间戳，查询大于等于该时间的数据" default()
+// @Param updatedAtMin query int64 false "UpdatedAt 起始时间, 毫秒数时间戳，查询大于等于updatedAtMin 该时间的数据" default()
+// @Param updatedAtMax query int64 false "UpdatedAt 结束时间, 毫秒数时间戳，查询小于updatedAtMax 该时间的数据" default()
 // @Param orderBy query string false "orderBy" default()
 // @Param page query int false "page" default(1)
 // @Param pageSize query int false "pageSize" default(10)
@@ -128,6 +132,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 			queryValue := g.Query("roleNameEn")
 			whereConditions = append(whereConditions, biz.SysRoleDao.RoleNameEn.Eq(queryValue))
 		}
+
 		if len(g.Query("status")) > 0 {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("status"), ",")
@@ -142,6 +147,8 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 				whereConditions = append(whereConditions, biz.SysRoleDao.Status.In(queryValues...))
 			}
 		}
+
+
 		if len(g.Query("priority")) > 0 {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("priority"), ",")
@@ -156,10 +163,12 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 				whereConditions = append(whereConditions, biz.SysRoleDao.Priority.In(queryValues...))
 			}
 		}
+
 		if len(g.Query("comment")) > 0 {
 			queryValue := g.Query("comment")
 			whereConditions = append(whereConditions, biz.SysRoleDao.Comment.Eq(queryValue))
 		}
+
 		if len(g.Query("deleted")) > 0 {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("deleted"), ",")
@@ -174,46 +183,87 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 				whereConditions = append(whereConditions, biz.SysRoleDao.Deleted.In(queryValues...))
 			}
 		}
+
 		if len(g.Query("lastmodifiedBy")) > 0 {
 			queryValue := g.Query("lastmodifiedBy")
 			whereConditions = append(whereConditions, biz.SysRoleDao.LastmodifiedBy.Eq(queryValue))
 		}
-		if len(g.Query("lastmodified")) > 0 {
-			lastmodifiedMills, err := strconv.ParseInt(g.Query("lastmodified"), 10, 64)
+
+		// query data of lastmodified between lastmodifiedMin and lastmodifiedMax:
+		if len(g.Query("lastmodifiedMin")) > 0 {
+			lastmodifiedMills, err := strconv.ParseInt(g.Query("lastmodifiedMin"), 10, 64)
 			if err == nil {
-				lastmodified := time.Unix(lastmodifiedMills/1000, 0)
-				whereConditions = append(whereConditions, biz.SysRoleDao.Lastmodified.Gte(lastmodified))
+				lastmodifiedMin := time.Unix(lastmodifiedMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.Lastmodified.Gte(lastmodifiedMin))
 			}
 		}
+		if len(g.Query("lastmodifiedMax")) > 0 {
+			lastmodifiedMills, err := strconv.ParseInt(g.Query("lastmodified"), 10, 64)
+			if err == nil {
+				lastmodifiedMax := time.Unix(lastmodifiedMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.Lastmodified.Lt(lastmodifiedMax))
+			}
+		}
+
 		if len(g.Query("createdBy")) > 0 {
 			queryValue := g.Query("createdBy")
 			whereConditions = append(whereConditions, biz.SysRoleDao.CreatedBy.Eq(queryValue))
 		}
-		if len(g.Query("created")) > 0 {
+
+		// query data of created between createdMin and createdMax:
+		if len(g.Query("createdMin")) > 0 {
+			createdMills, err := strconv.ParseInt(g.Query("createdMin"), 10, 64)
+			if err == nil {
+				createdMin := time.Unix(createdMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.Created.Gte(createdMin))
+			}
+		}
+		if len(g.Query("createdMax")) > 0 {
 			createdMills, err := strconv.ParseInt(g.Query("created"), 10, 64)
 			if err == nil {
-				created := time.Unix(createdMills/1000, 0)
-				whereConditions = append(whereConditions, biz.SysRoleDao.Created.Gte(created))
+				createdMax := time.Unix(createdMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.Created.Lt(createdMax))
 			}
 		}
-		if len(g.Query("createdAt")) > 0 {
+
+
+		// query data of createdAt between createdAtMin and createdAtMax:
+		if len(g.Query("createdAtMin")) > 0 {
+			createdAtMills, err := strconv.ParseInt(g.Query("createdAtMin"), 10, 64)
+			if err == nil {
+				createdAtMin := time.Unix(createdAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.CreatedAt.Gte(createdAtMin))
+			}
+		}
+		if len(g.Query("createdAtMax")) > 0 {
 			createdAtMills, err := strconv.ParseInt(g.Query("createdAt"), 10, 64)
 			if err == nil {
-				createdAt := time.Unix(createdAtMills/1000, 0)
-				whereConditions = append(whereConditions, biz.SysRoleDao.CreatedAt.Gte(createdAt))
+				createdAtMax := time.Unix(createdAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.CreatedAt.Lt(createdAtMax))
 			}
 		}
+
 		if len(g.Query("updatedBy")) > 0 {
 			queryValue := g.Query("updatedBy")
 			whereConditions = append(whereConditions, biz.SysRoleDao.UpdatedBy.Eq(queryValue))
 		}
-		if len(g.Query("updatedAt")) > 0 {
-			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAt"), 10, 64)
+
+		// query data of updatedAt between updatedAtMin and updatedAtMax:
+		if len(g.Query("updatedAtMin")) > 0 {
+			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAtMin"), 10, 64)
 			if err == nil {
-				updatedAt := time.Unix(updatedAtMills/1000, 0)
-				whereConditions = append(whereConditions, biz.SysRoleDao.UpdatedAt.Gte(updatedAt))
+				updatedAtMin := time.Unix(updatedAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.UpdatedAt.Gte(updatedAtMin))
 			}
 		}
+		if len(g.Query("updatedAtMax")) > 0 {
+			updatedAtMills, err := strconv.ParseInt(g.Query("updatedAt"), 10, 64)
+			if err == nil {
+				updatedAtMax := time.Unix(updatedAtMills/1000, 0)
+				whereConditions = append(whereConditions, biz.SysRoleDao.UpdatedAt.Lt(updatedAtMax))
+			}
+		}
+
 
 
 	}

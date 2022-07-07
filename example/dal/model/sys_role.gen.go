@@ -13,19 +13,19 @@ const TableNameSysRole = "sys_role"
 // SysRole mapped from table <sys_role>
 type SysRole struct {
 	ID             int64     `gorm:"column:id;primaryKey;autoIncrement:true" json:"id"`
-	RoleName       string    `gorm:"column:role_name" json:"role_name"`
-	RoleNameEn     string    `gorm:"column:role_name_en" json:"role_name_en"`
+	RoleName       string    `gorm:"column:role_name" json:"roleName"`
+	RoleNameEn     string    `gorm:"column:role_name_en" json:"roleNameEn"`
 	Status         int32     `gorm:"column:status" json:"status"`
 	Priority       int32     `gorm:"column:priority" json:"priority"`
 	Comment        string    `gorm:"column:comment" json:"comment"`
 	Deleted        int32     `gorm:"column:deleted" json:"deleted"`
-	LastmodifiedBy string    `gorm:"column:lastmodified_by" json:"lastmodified_by"`
+	LastmodifiedBy string    `gorm:"column:lastmodified_by" json:"lastmodifiedBy"`
 	Lastmodified   time.Time `gorm:"column:lastmodified" json:"lastmodified"`
-	CreatedBy      string    `gorm:"column:created_by" json:"created_by"`
+	CreatedBy      string    `gorm:"column:created_by" json:"createdBy"`
 	Created        time.Time `gorm:"column:created" json:"created"`
-	CreatedAt      time.Time `gorm:"column:created_at" json:"created_at"`
-	UpdatedBy      string    `gorm:"column:updated_by" json:"updated_by"`
-	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updated_at"`
+	CreatedAt      time.Time `gorm:"column:created_at" json:"createdAt"`
+	UpdatedBy      string    `gorm:"column:updated_by" json:"updatedBy"`
+	UpdatedAt      time.Time `gorm:"column:updated_at" json:"updatedAt"`
 }
 
 // TableName SysRole's table name

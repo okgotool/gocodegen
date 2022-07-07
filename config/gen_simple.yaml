@@ -23,15 +23,15 @@ gen:
     enable: true
     overWrite: true
   genDataSource: 
-    enable: false
+    enable: true
     overWrite: false
   genDal: 
     enable: true
     overWrite: true
   dataSources:
     - dataSourceName: db1
-      dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True
-      # code: app.AlertDB
+      # dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True
+      code: app.AlertDB
   genTables:
     - tableName: sys_role
     - tableName: test_cat
