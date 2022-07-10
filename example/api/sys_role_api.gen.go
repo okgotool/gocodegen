@@ -554,7 +554,7 @@ func (c *SysRoleApiType) Remove(g *gin.Context) {
 // @Produce json
 // @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
 // @Failure 210 {object} response.FailedWithReason "{\"code\":400,\"msg\":\"参数错误\"}"
-// @Router /api/v1/{TableModelNameLowCase}s/soft [delete]
+// @Router /api/v1/sysroles/soft [delete]
 // @Security ApiKeyAuth
 func (c *SysRoleApiType) SoftRemove(g *gin.Context) {
 
@@ -610,7 +610,7 @@ func (c *SysRoleApiType) SoftRemove(g *gin.Context) {
 // @Produce json
 // @Success 200 {object} response.SuccessInt64 "{\"code\":200,\"msg\":\"ok\"}"
 // @Failure 210 {object} response.FailedWithReason "{\"code\":500,\"msg\":\"执行失败\"}"
-// @Router /api/v1/{TableModelNameLowCase}s/clean [delete]
+// @Router /api/v1/sysroles/clean [delete]
 // @Security ApiKeyAuth
 func (c *SysRoleApiType) Clean(g *gin.Context) {
 

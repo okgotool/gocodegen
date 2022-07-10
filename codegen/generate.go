@@ -63,9 +63,9 @@ func StartGenConfig(config *GenConfig) {
 	for _, model := range dbModels {
 		GenerateBizCode(config, model)
 		GenerateApis(config, model)
-		GenerateVueCodes(config, model)
+		VueElementAdminGen.GenerateVueCodes(config, model)
 	}
-	GenerateVueRouter(config, dbModels)
+	VueElementAdminGen.GenerateVueRouter(config, dbModels)
 }
 
 func getDbTableModels(config *GenConfig) []*DbModel {
@@ -126,11 +126,20 @@ func getDbTableModels(config *GenConfig) []*DbModel {
 
 					modelFields := getDbModeFields(astNode)
 
+					primaryKeyPropertyName := "ID"
+					for _, field := range modelFields {
+						if field.IsPrimaryKey || field.IsAutoIncrement {
+							primaryKeyPropertyName = field.ModelFieldName
+							break
+						}
+					}
+
 					table := &DbModel{
-						TableName:           modelTableName,
-						StructName:          modelStructName,
-						PrivatePropertyName: strings.ToLower(string(modelStructName[0])) + modelStructName[1:],
-						Fields:              modelFields,
+						TableName:              modelTableName,
+						StructName:             modelStructName,
+						PrivatePropertyName:    strings.ToLower(string(modelStructName[0])) + modelStructName[1:],
+						Fields:                 modelFields,
+						PrimaryKeyPropertyName: primaryKeyPropertyName,
 					}
 
 					dbTables = append(dbTables, table)
@@ -164,7 +173,7 @@ func getDbModeFields(f ast.Node) []*DbModelFieldAndColumn {
 					privateModelFieldName = strings.ToLower(string(modelFieldName[0])) + modelFieldName[1:] // lowercase for first chart
 				}
 
-				tags := modelField.Tag.Value
+				tags := modelField.Tag.Value // eg. "`gorm:\"column:id;primaryKey;autoIncrement:true\" json:\"id\"`"
 				columnName := ""
 				columnNames := strings.Split(tags, "column:")
 				if len(columnNames) > 1 {
@@ -178,6 +187,8 @@ func getDbModeFields(f ast.Node) []*DbModelFieldAndColumn {
 					ModelFieldName:        modelFieldName,
 					PrivateModelFieldName: privateModelFieldName,
 					ColumnName:            columnName,
+					IsPrimaryKey:          strings.Contains(strings.ToLower(tags), "primarykey"),
+					IsAutoIncrement:       strings.Contains(strings.ToLower(tags), "autoincrement"),
 				}
 				modelFields = append(modelFields, field)
 

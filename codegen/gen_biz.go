@@ -38,6 +38,7 @@ func GenerateBizCode(config *GenConfig, model *DbModel) {
 			whereStr := "tx = tx.Where(" + model.StructName + "Dao.Deleted.Eq(0))"
 			codes = strings.Replace(codes, "// {QueryDeletedWhereCondition}", whereStr, -1)
 		}
+		codes = strings.Replace(codes, "{PrimaryKeyPropertyName}", model.PrimaryKeyPropertyName, -1)
 
 		WriteFile(fileName, codes)
 

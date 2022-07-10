@@ -4,10 +4,11 @@ import "strings"
 
 type (
 	DbModel struct {
-		StructName          string
-		TableName           string
-		PrivatePropertyName string
-		Fields              []*DbModelFieldAndColumn
+		StructName             string
+		TableName              string
+		PrivatePropertyName    string
+		PrimaryKeyPropertyName string
+		Fields                 []*DbModelFieldAndColumn
 	}
 
 	DbModelFieldAndColumn struct {
@@ -16,6 +17,8 @@ type (
 		ColumnName                          string
 		ModelFieldType                      string
 		ColumnType                          string
+		IsPrimaryKey                        bool
+		IsAutoIncrement                     bool
 		IgnoreGenerateRequestModel          bool
 		IgnoreGenerateRequestQueryParameter bool
 		IgnoreGenerateResponseModel         bool

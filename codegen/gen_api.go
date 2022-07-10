@@ -123,6 +123,9 @@ func generateApiMethodCode(config *GenConfig, tableName string, modelName string
 			}
 		}
 
+		codes = strings.Replace(codes, "{TableModelNameLowCase}", strings.ToLower(modelName), -1)
+		codes = strings.Replace(codes, "{PrimaryKeyPropertyName}", model.PrimaryKeyPropertyName, -1)
+
 		WriteFile(fileName, codes)
 	}
 }

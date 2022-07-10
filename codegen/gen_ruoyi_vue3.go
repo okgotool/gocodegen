@@ -5,35 +5,49 @@ import (
 	"strings"
 )
 
-func GenerateVueCodes(config *GenConfig, model *DbModel) {
-	if config.Gen.GenVue2 == nil || !config.Gen.GenVue2.Enable || len(config.Gen.GenVue2.VueProjectRoot) < 1 {
+var (
+	RuoyiVue3Gen = &RuoyiVue3GenType{}
+)
+
+type (
+	RuoyiVue3GenType struct {
+	}
+)
+
+func (v *RuoyiVue3GenType) GenerateRuoyiCodes(config *GenConfig, model *DbModel) {
+	if config.Gen.GenRuoyiVue3 == nil || !config.Gen.GenRuoyiVue3.Enable || len(config.Gen.GenRuoyiVue3.ProjectRoot) < 1 {
 		return
 	}
 
-	GenVueClientApis(config, model)
-	GenVueViews(config, model)
+	v.GenMenus(config, model)
+	v.GenApiJs(config, model)
+	v.GenVueViews(config, model)
 }
 
-func GenVueClientApis(config *GenConfig, model *DbModel) {
-	templateCodes := GetTemplate(TemplateVueApiKey)
+func (v *RuoyiVue3GenType) GenMenus(config *GenConfig, model *DbModel) {
+
+}
+
+func (v *RuoyiVue3GenType) GenApiJs(config *GenConfig, model *DbModel) {
+	templateCodes := GetTemplate(TemplateRuoyiVue3ApiKey)
 	// deleted column:
 	if model.HasDeletedColumn() {
-		templateCodes += GetTemplate(TemplateVueApiDeletedColumnKey)
+		templateCodes += GetTemplate(TemplateRuoyiVue3ApiDeletedColumnKey)
 	}
 
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{TableModelNameLowCase}", strings.ToLower(model.StructName), -1)
 
-	queryParams := getVueQueryParameters(model)
+	queryParams := v.getVueQueryParameters(model)
 	templateCodes = strings.Replace(templateCodes, "// {其它查询参数}", queryParams, -1)
 
-	vueFolder := config.Gen.GenVue2.VueProjectRoot + "/src/api"
+	vueFolder := config.Gen.GenRuoyiVue3.ProjectRoot + "/src/api"
 	os.MkdirAll(vueFolder, 0666)
 	WriteFile(vueFolder+"/"+model.PrivatePropertyName+".js", templateCodes)
 }
 
-func GenVueViews(config *GenConfig, model *DbModel) {
-	templateCodes := GetTemplate(TemplateVueViewKey)
+func (v *RuoyiVue3GenType) GenVueViews(config *GenConfig, model *DbModel) {
+	templateCodes := GetTemplate(TemplateRuoyiVue3ViewKey)
 
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{LowerFirstCharTableModelName}", model.PrivatePropertyName, -1)
@@ -101,17 +115,17 @@ func GenVueViews(config *GenConfig, model *DbModel) {
 	templateCodes = strings.Replace(templateCodes, "// {ModelCreateFormItemNames}", createFormItemNames, -1)
 
 	fileName := strings.ToLower(model.StructName)
-	vueFolder := config.Gen.GenVue2.VueProjectRoot + "/src/views/gen"
+	vueFolder := config.Gen.GenRuoyiVue3.ProjectRoot + "/src/views/gen"
 	os.MkdirAll(vueFolder, 0666)
 	WriteFile(vueFolder+"/"+fileName+".vue", templateCodes)
 }
 
-func GenerateVueRouter(config *GenConfig, models []*DbModel) {
-	if config.Gen.GenVue2 == nil || !config.Gen.GenVue2.Enable || len(config.Gen.GenVue2.VueProjectRoot) < 1 {
+func (v *RuoyiVue3GenType) GenerateVueRouter(config *GenConfig, models []*DbModel) {
+	if config.Gen.GenRuoyiVue3 == nil || !config.Gen.GenRuoyiVue3.Enable || len(config.Gen.GenRuoyiVue3.ProjectRoot) < 1 {
 		return
 	}
 
-	templateCodes := GetTemplate(TemplateVueRouterKey)
+	templateCodes := GetTemplate(TemplateRuoyiVue3MenuKey)
 
 	codes := ""
 	for _, model := range models {
@@ -127,12 +141,12 @@ func GenerateVueRouter(config *GenConfig, models []*DbModel) {
 	codes = codes[0:(len(codes) - 2)]
 	templateCodes = strings.Replace(templateCodes, "// {VueRouterModelCodes}", codes, -1)
 
-	vueFolder := config.Gen.GenVue2.VueProjectRoot + "/src/router/modules"
+	vueFolder := config.Gen.GenRuoyiVue3.ProjectRoot + "/src/router/modules"
 	os.MkdirAll(vueFolder, 0666)
 	WriteFile(vueFolder+"/goCodeGen.js", templateCodes)
 }
 
-func getVueQueryParameters(model *DbModel) string {
+func (v *RuoyiVue3GenType) getVueQueryParameters(model *DbModel) string {
 	codes := ""
 	for _, modelField := range model.Fields {
 		if !modelField.IgnoreGenerateRequestQueryParameter && len(modelField.PrivateModelFieldName) > 0 {

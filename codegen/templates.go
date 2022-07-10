@@ -22,10 +22,16 @@ const (
 	TemplateApiUpdateKey           = "apiUpdate"
 	TemplateApiRemoveKey           = "apiRemove"
 	TemplateApiDeletedKey          = "apiDeleted"
-	TemplateVueApiKey              = "vueApi"
-	TemplateVueApiDeletedColumnKey = "vueApiDeletedColumn"
-	TemplateVueViewKey             = "vueView"
-	TemplateVueRouterKey           = "vueRouter"
+
+	TemplateVueElementAdminApiKey              = "vueElementAdminApi"
+	TemplateVueElementAdminApiDeletedColumnKey = "vueElementAdminApiDeletedColumn"
+	TemplateVueElementAdminViewKey             = "vueElementAdminView"
+	TemplateVueElementAdminRouterKey           = "vueElementAdminRouter"
+
+	TemplateRuoyiVue3ApiKey              = "ruoniVue3Api"
+	TemplateRuoyiVue3ApiDeletedColumnKey = "ruoniVue3ApiDeletedColumn"
+	TemplateRuoyiVue3ViewKey             = "ruoniVue3View"
+	TemplateRuoyiVue3MenuKey             = "ruoniVue3Menu"
 )
 
 var (
@@ -45,10 +51,16 @@ var (
 		TemplateApiUpdateKey:           app.RUNTIME_PATH + "/template/api/api_update.template",
 		TemplateApiRemoveKey:           app.RUNTIME_PATH + "/template/api/api_remove.template",
 		TemplateApiDeletedKey:          app.RUNTIME_PATH + "/template/api/api_deleted_column.template",
-		TemplateVueApiKey:              app.RUNTIME_PATH + "/template/vue/vue_api.template",
-		TemplateVueApiDeletedColumnKey: app.RUNTIME_PATH + "/template/vue/vue_api_deleted_column.template",
-		TemplateVueViewKey:             app.RUNTIME_PATH + "/template/vue/vue_view.template",
-		TemplateVueRouterKey:           app.RUNTIME_PATH + "/template/vue/vue_router.template",
+
+		TemplateVueElementAdminApiKey:              app.RUNTIME_PATH + "/template/vue_element_admin/vue_api.template",
+		TemplateVueElementAdminApiDeletedColumnKey: app.RUNTIME_PATH + "/template/vue_element_admin/vue_api_deleted_column.template",
+		TemplateVueElementAdminViewKey:             app.RUNTIME_PATH + "/template/vue_element_admin/vue_view.template",
+		TemplateVueElementAdminRouterKey:           app.RUNTIME_PATH + "/template/vue_element_admin/vue_router.template",
+
+		TemplateRuoyiVue3ApiKey:              app.RUNTIME_PATH + "/template/ruoyi_vue3/api.js.template",
+		TemplateRuoyiVue3ApiDeletedColumnKey: app.RUNTIME_PATH + "/template/ruoyi_vue3/api_deleted_column.template",
+		TemplateRuoyiVue3ViewKey:             app.RUNTIME_PATH + "/template/ruoyi_vue3/index.vue.template",
+		TemplateRuoyiVue3MenuKey:             app.RUNTIME_PATH + "/template/ruoyi_vue3/menu.sql.template",
 	}
 
 	templateContents map[string]string = map[string]string{}

@@ -9,9 +9,12 @@ gen:
   dmlFolder: ./db_dml
   runDml: 
     enable: true
-  genVue:
+  genRuoyiVue3:
     enable: true
-    vueProjectRoot: ./example
+    projectRoot: ./example/ruoyi_vue3
+  genVueElementAdmin:
+    enable: true
+    projectRoot: ./example/vue_element_admin
   genApi: 
     enable: true
     overWrite: true

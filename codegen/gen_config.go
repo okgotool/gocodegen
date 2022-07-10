@@ -22,26 +22,32 @@ type (
 	}
 
 	GenConfigGen struct {
-		DmlFolder     string                  `yaml:"dmlFolder"`
-		RunDml        *GenConfigRunDml        `yaml:"runDml"`
-		GenVue2       *GenConfigGenVue        `yaml:"genVue2"`
-		GenApi        *GenConfigGenApi        `yaml:"genApi"`
-		GenBiz        *GenConfigGenBiz        `yaml:"genBiz"`
-		GenDataSource *GenConfigGenDataSource `yaml:"genDataSource"`
-		GenDal        *GenConfigGenDal        `yaml:"genDal"`
-		DataSources   []*GenConfigDataSource  `yaml:"dataSources"`
-		GenTables     []*GenConfigTable       `yaml:"genTables"`
-		OutputRoot    string                  `yaml:"outputRoot"`
-		PackageRoot   string                  `yaml:"packageRoot"`
+		DmlFolder          string                       `yaml:"dmlFolder"`
+		RunDml             *GenConfigRunDml             `yaml:"runDml"`
+		GenRuoyiVue3       *GenConfigGenRuoyiVue3       `yaml:"genRuoyiVue3"`
+		GenVueElementAdmin *GenConfigGenVueElementAdmin `yaml:"genVueElementAdmin"`
+		GenApi             *GenConfigGenApi             `yaml:"genApi"`
+		GenBiz             *GenConfigGenBiz             `yaml:"genBiz"`
+		GenDataSource      *GenConfigGenDataSource      `yaml:"genDataSource"`
+		GenDal             *GenConfigGenDal             `yaml:"genDal"`
+		DataSources        []*GenConfigDataSource       `yaml:"dataSources"`
+		GenTables          []*GenConfigTable            `yaml:"genTables"`
+		OutputRoot         string                       `yaml:"outputRoot"`
+		PackageRoot        string                       `yaml:"packageRoot"`
 	}
 
 	GenConfigRunDml struct {
 		Enable bool `yaml:"enable"`
 	}
 
-	GenConfigGenVue struct {
-		Enable         bool   `yaml:"enable"`
-		VueProjectRoot string `yaml:"vueProjectRoot"`
+	GenConfigGenRuoyiVue3 struct {
+		Enable      bool   `yaml:"enable"`
+		ProjectRoot string `yaml:"projectRoot"`
+	}
+
+	GenConfigGenVueElementAdmin struct {
+		Enable      bool   `yaml:"enable"`
+		ProjectRoot string `yaml:"projectRoot"`
 	}
 
 	GenConfigGenApi struct {

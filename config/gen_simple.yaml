@@ -7,9 +7,12 @@ mysql:
   conn: charset=utf8mb4&parseTime=True
 gen:
   dmlFolder: ./db_dml
-  genVue2:
+  genRuoyiVue3:
     enable: true
-    vueProjectRoot: ./example/vue2
+    projectRoot: ./example/ruoyi_vue3
+  genVueElementAdmin:
+    enable: true
+    projectRoot: ./example/vue_element_admin
   genApi: 
     enable: true
     overWrite: true
@@ -30,8 +33,8 @@ gen:
     overWrite: true
   dataSources:
     - dataSourceName: db1
-      # dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True
-      code: app.AlertDB
+      dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True
+      # code: app.AlertDB
   genTables:
     - tableName: sys_role
     - tableName: test_cat

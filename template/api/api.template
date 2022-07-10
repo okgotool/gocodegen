@@ -102,7 +102,7 @@ func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
 		if err != nil {
 			errMsgs["id"] = err.Error()
 		} else {
-			whereConditions = append(whereConditions, biz.{TableModelName}Dao.ID.Eq(id))
+			whereConditions = append(whereConditions, biz.{TableModelName}Dao.{PrimaryKeyPropertyName}.Eq(id))
 		}
 	} else { // 多条件查询
 
@@ -180,8 +180,8 @@ func (c *{TableModelName}ApiType) CreateBatch(g *gin.Context) {
 		})
 	} else {
         for _, model := range rs {
-            if model.ID > 0 {
-                newIds = append(newIds, model.ID)
+            if model.{PrimaryKeyPropertyName} > 0 {
+                newIds = append(newIds, model.{PrimaryKeyPropertyName})
             }
         }
 
@@ -232,7 +232,7 @@ func (c *{TableModelName}ApiType) Create(g *gin.Context) {
 		g.JSON(response.OKCode, &response.SuccessInt64{
 			Code: response.StatusOK,
 			Msg:  "ok",
-			Data: rs.ID,
+			Data: rs.{PrimaryKeyPropertyName},
 		})
 	}
 }
