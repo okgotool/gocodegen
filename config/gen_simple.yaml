@@ -37,6 +37,8 @@ gen:
       # code: app.AlertDB
   genTables:
     - tableName: sys_role
+      parentMenu: 生成代码
     - tableName: test_cat
+      parentMenu: 生成代码
   outputRoot: ./example
   packageRoot: github.com/okgotool/gocodegen/example

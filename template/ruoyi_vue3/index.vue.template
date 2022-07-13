@@ -85,7 +85,6 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改用户和角色关联对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
       </el-form>
@@ -98,10 +97,10 @@
 </template>
 
 <script>
-import { listRole, getRole, delRole, addRole, updateRole } from "@/api/system/role";
+import { list{TableModelName}, get{TableModelName}, del{TableModelName}, add{TableModelName}, update{TableModelName} } from "@/api/codegen/{LowerFirstCharTableModelName}";
 
 export default {
-  name: "Role",
+  name: "{TableModelName}",
   data() {
     return {
       // 遮罩层
@@ -141,7 +140,7 @@ export default {
     /** 查询用户和角色关联列表 */
     getList() {
       this.loading = true;
-      listRole(this.queryParams).then(response => {
+      list{TableModelName}(this.queryParams).then(response => {
         this.roleList = response.rows;
         this.total = response.total;
         this.loading = false;
@@ -186,7 +185,7 @@ export default {
     handleUpdate(row) {
       this.reset();
       const userId = row.userId || this.ids
-      getRole(userId).then(response => {
+      get{TableModelName}(userId).then(response => {
         this.form = response.data;
         this.open = true;
         this.title = "修改用户和角色关联";
@@ -197,13 +196,13 @@ export default {
       this.$refs["form"].validate(valid => {
         if (valid) {
           if (this.form.userId != null) {
-            updateRole(this.form).then(response => {
+            update{TableModelName}(this.form).then(response => {
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
             });
           } else {
-            addRole(this.form).then(response => {
+            add{TableModelName}(this.form).then(response => {
               this.$modal.msgSuccess("新增成功");
               this.open = false;
               this.getList();
@@ -216,7 +215,7 @@ export default {
     handleDelete(row) {
       const userIds = row.userId || this.ids;
       this.$modal.confirm('是否确认删除用户和角色关联编号为"' + userIds + '"的数据项？').then(function() {
-        return delRole(userIds);
+        return del{TableModelName}(userIds);
       }).then(() => {
         this.getList();
         this.$modal.msgSuccess("删除成功");

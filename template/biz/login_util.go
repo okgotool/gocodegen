@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	TOKEN_KEY = "IOTMAN20220628"
+	TOKEN_KEY = "GOCODEGEN20220808"
 )
 
 func CreatePasswordHash(password string) (string, error) {

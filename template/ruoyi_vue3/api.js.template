@@ -1,44 +1,44 @@
 import request from '@/utils/request'
 
 // 查询列表
-export function listRole(query) {
+export function list{TableModelName}(query) {
   return request({
-    url: '/system/role/list',
+    url: '/api/v1/{TableModelNameLowCase}s',
     method: 'get',
     params: query
   })
 }
 
 // 按ID查询详细
-export function getRole(userId) {
+export function get{TableModelName}(id) {
   return request({
-    url: '/system/role/' + userId,
+    url: '/api/v1/{TableModelNameLowCase}s?id=' + id,
     method: 'get'
   })
 }
 
 // 新增
-export function addRole(data) {
+export function add{TableModelName}(data) {
   return request({
-    url: '/system/role',
+    url: '/api/v1/{TableModelNameLowCase}',
     method: 'post',
     data: data
   })
 }
 
 // 修改
-export function updateRole(data) {
+export function update{TableModelName}(data) {
   return request({
-    url: '/system/role',
+    url: '/api/v1/{TableModelNameLowCase}',
     method: 'put',
     data: data
   })
 }
 
 // 删除
-export function delRole(userId) {
+export function del{TableModelName}(id) {
   return request({
-    url: '/system/role/' + userId,
+    url: '/api/v1/{TableModelNameLowCase}s?id=' + id,
     method: 'delete'
   })
 }

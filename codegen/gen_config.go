@@ -86,6 +86,7 @@ type (
 		ModelName      string            `yaml:"modelName"`
 		Fields         []*GenConfigField `yaml:"fields"`
 		GenApis        []string          `yaml:"genApis"`
+		ParentMenu     string            `yaml:"parentMenu"`
 	}
 
 	GenConfigField struct {

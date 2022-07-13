@@ -38,8 +38,8 @@ func (v *RuoyiVue3GenType) GenApiJs(config *GenConfig, model *DbModel) {
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{TableModelNameLowCase}", strings.ToLower(model.StructName), -1)
 
-	queryParams := v.getVueQueryParameters(model)
-	templateCodes = strings.Replace(templateCodes, "// {其它查询参数}", queryParams, -1)
+	// queryParams := v.getVueQueryParameters(model)
+	// templateCodes = strings.Replace(templateCodes, "// {其它查询参数}", queryParams, -1)
 
 	vueFolder := config.Gen.GenRuoyiVue3.ProjectRoot + "/src/api"
 	os.MkdirAll(vueFolder, 0666)
