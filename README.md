@@ -30,6 +30,9 @@ API 文档使用 go-swagger：https://github.com/go-swagger/go-swagger
   - query # Gen DAO查询逻辑
 - model # 公共model层
   - response # 公共model，如request、response
+- db_migrate # 数据库相关代码，如菜单
+- ruoyi_vue3 # ruoyi vue3代码
+- vue_element_admin # vue_element_admin代码
 
 ```
 
@@ -53,17 +56,50 @@ mysql: # 连接数据库来生成代码
   conn: charset=utf8mb4&parseTime=True
 gen:
   dmlFolder: ./db_dml # 创建数据库表sql的目录
-  runDml: true # 是否运行数据库表创建sql
-  genApi: true # 是否生成API层代码
-  genBiz: true # 是否生成Biz层代码
-  genDal: true # 是否生成dal层代码
-  forceOverWrite: true # 是否完全覆盖原来的文件，false时则只会生成一次，后面修改了也不会覆盖
-  dataSources: # 生成的产品代码使用的数据库连接
+  genRuoyiVue3: # 生成Ruoyi vue3代码的配置
+    enable: true  # 是否开启
+    projectRoot: ./example/ruoyi_vue3 # Ruoyi vue3代码生成的根目录，将按结构生成代码
+    topMenus: # 一级菜单
+      - name: 管理首页
+        path: dashboard
+        icon: smile
+        orderNum: 1
+      - name: 系统设置
+        path: system
+        icon: component
+        orderNum: 2
+  genVueElementAdmin: # 生成 vue element admin代码配置
+    enable: true # 是否开启
+    projectRoot: ./example/vue_element_admin # 代码生成根目录，将按结构生成代码
+  genApi:  # 生成后端API
+    enable: true
+    overWrite: true # 如果文件存在，是否覆盖
+    apiGroup: v1 
+    excludeColumnsForQueryParameters: # 查询API参数不包含的字段（驼峰格式对象属性）
+      - deleted
+      - lastmodified
+    excludeColumnsForResponse:
+      - deleted
+  genBiz: # 业务层代码
+    enable: true
+    overWrite: true
+  genDataSource:  # 数据源代码
+    enable: true
+    overWrite: false
+  genDal: # dal代码
+    enable: true
+    overWrite: true
+  dataSources: # 获取数据源代码
     - dataSourceName: db1 # 数据库连接名字，下面每个表可以指定不同的数据库
-      dsn: user:passwd@(127.0.0.1:3306)/dbname?charset=utf8mb4&parseTime=True # 数据库连接语句
-  genTables: # 生成表的配置，不配置时生成数据库中所有表，配置了则只生成下面列表的表的代码
-    - tableName: sys_role # 表名
+      dsn: root:passwd@(127.0.0.1:3306)/ai_iotman?charset=utf8mb4&parseTime=True # 直接使用连接字符串，测试时可使用
+      # code: app.DBCoon # 使用代码片段获取
+  genTables: # 生成哪些表，不配置时生成数据库中所有表，配置了则只生成下面列表的表的代码
+    - tableName: sys_role # 需要生成代码的表名
+      parentMenu: 设备管理 # 生成前端放到哪个一级菜单下
+      menuName: 角色管理 # 生成前端的菜单名
     - tableName: test_cat
+      parentMenu: 实时监控
+      menuName: 动力系统
       dataSourceName: db1 # 使用的数据源
       fields: # 表字段的生成配置，配置了则使用配置的，否则使用默认配置
         - columnName: id # 表字段名称
@@ -73,8 +109,9 @@ gen:
           fieldName: NewFieldName
         - columnName: lastmodified
           isIgnore: false
-  outputRoot: ./example # 生成的代码的目的目录
+  outputRoot: ./example # 后端代码生成的位置
   packageRoot: github.com/okgotool/gocodegen/example # 生成的代码的包，import使用
+
 
 ```
 

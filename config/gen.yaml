@@ -12,6 +12,15 @@ gen:
   genRuoyiVue3:
     enable: true
     projectRoot: ./example/ruoyi_vue3
+    topMenus:
+      - name: 管理首页
+        path: dashboard
+        icon: smile
+        orderNum: 1
+      - name: 系统设置
+        path: systemrealtime
+        icon: component
+        orderNum: 2
   genVueElementAdmin:
     enable: true
     projectRoot: ./example/vue_element_admin
@@ -47,6 +56,8 @@ gen:
       # code: app.AlertDB
   genTables:
     - tableName: sys_role
+      parentMenu: 系统管理
+      menuName: 角色管理
       genApis:
         - QueryAll
         - QueryByCondition
