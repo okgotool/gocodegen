@@ -26,6 +26,9 @@ func GenerateFolders(conf *GenConfig) {
 	os.Mkdir(rootPath+"/model/request", 0666)
 	os.Mkdir(rootPath+"/model/response", 0666)
 
+	// db migrate:
+	os.Mkdir(rootPath+"/db_migrate", 0666)
+
 	// config folder:
 	os.Mkdir(rootPath+"/config", 0666)
 

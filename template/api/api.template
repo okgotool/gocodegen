@@ -53,7 +53,7 @@ func (c *{TableModelName}ApiType) QueryAll(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.{TableModelName}Service.QueryAll(nil, orderBys, page, pageSize)
+	rs, total, err := biz.{TableModelName}Service.QueryAll(nil, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -66,6 +66,7 @@ func (c *{TableModelName}ApiType) QueryAll(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total,
 		})
 	}
 }
@@ -120,7 +121,7 @@ func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.{TableModelName}Service.QueryAll(whereConditions, orderBys, page, pageSize)
+	rs, total, err := biz.{TableModelName}Service.QueryAll(whereConditions, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -133,6 +134,7 @@ func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total, 
 		})
 	}
 }

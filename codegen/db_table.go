@@ -8,6 +8,7 @@ type (
 		TableName              string
 		PrivatePropertyName    string
 		PrimaryKeyPropertyName string
+		PathName               string
 		Fields                 []*DbModelFieldAndColumn
 	}
 

@@ -2,7 +2,63 @@
    <div class="app-container">
       <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
 
-<!-- {ModelSearchFormItems} -->
+      <el-form-item label="ID" prop="id">
+      <el-input
+         v-model="queryParams.id"
+         placeholder="请输入ID"
+         clearable
+         style="width: 240px"
+         @keyup.enter="handleQuery"
+      />
+    </el-form-item>
+      <el-form-item label="CatName" prop="catName">
+      <el-input
+         v-model="queryParams.catName"
+         placeholder="请输入CatName"
+         clearable
+         style="width: 240px"
+         @keyup.enter="handleQuery"
+      />
+    </el-form-item>
+      <el-form-item label="CreatedBy" prop="createdBy">
+      <el-input
+         v-model="queryParams.createdBy"
+         placeholder="请输入CreatedBy"
+         clearable
+         style="width: 240px"
+         @keyup.enter="handleQuery"
+      />
+    </el-form-item>
+    <el-form-item label="CreatedAt" style="width: 308px">
+    <el-date-picker
+       v-model="dateRange"
+       value-format="YYYY-MM-DD"
+       type="daterange"
+       range-separator="-"
+       start-placeholder="开始时间"
+       end-placeholder="结束时间"
+    ></el-date-picker>
+    </el-form-item>
+      <el-form-item label="UpdatedBy" prop="updatedBy">
+      <el-input
+         v-model="queryParams.updatedBy"
+         placeholder="请输入UpdatedBy"
+         clearable
+         style="width: 240px"
+         @keyup.enter="handleQuery"
+      />
+    </el-form-item>
+    <el-form-item label="UpdatedAt" style="width: 308px">
+    <el-date-picker
+       v-model="dateRange"
+       value-format="YYYY-MM-DD"
+       type="daterange"
+       range-separator="-"
+       start-placeholder="开始时间"
+       end-placeholder="结束时间"
+    ></el-date-picker>
+    </el-form-item>
+
 
          <el-form-item>
             <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -66,7 +122,21 @@
       <el-table v-loading="loading" :data="typeList" @selection-change="handleSelectionChange">
          <el-table-column type="selection" width="55" align="center" />
 
-<!-- {ModelTableColumns} -->
+      <el-table-column label="ID" align="center" prop="id" />
+      <el-table-column label="CatName" align="center" prop="catName" />
+      <el-table-column label="CreatedBy" align="center" prop="createdBy" />
+    <el-table-column label="CreatedAt" align="center" prop="createdAt" width="180">
+      <template #default="scope">
+         <span>{{ parseTime(scope.row.createdAt) }}</span>
+      </template>
+      </el-table-column>
+      <el-table-column label="UpdatedBy" align="center" prop="updatedBy" />
+    <el-table-column label="UpdatedAt" align="center" prop="updatedAt" width="180">
+      <template #default="scope">
+         <span>{{ parseTime(scope.row.updatedAt) }}</span>
+      </template>
+      </el-table-column>
+
 
          <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
             <template #default="scope">
@@ -98,7 +168,16 @@
       <el-dialog :title="title" v-model="open" width="500px" append-to-body>
          <el-form ref="dictRef" :model="form" :rules="rules" label-width="80px">
 
-<!-- {ModelEditFormItems} -->
+        <el-form-item label="CatName" prop="catName">
+          <el-input v-model="form.catName" placeholder="请输入CatName" />
+        </el-form-item>
+        <el-form-item label="CreatedBy" prop="createdBy">
+          <el-input v-model="form.createdBy" placeholder="请输入CreatedBy" />
+        </el-form-item>
+        <el-form-item label="UpdatedBy" prop="updatedBy">
+          <el-input v-model="form.updatedBy" placeholder="请输入UpdatedBy" />
+        </el-form-item>
+
 
          </el-form>
          <template #footer>
@@ -112,7 +191,7 @@
 </template>
 
 <script setup name="Dict">
-import { list{TableModelName}, get{TableModelName}, del{TableModelName}, add{TableModelName}, update{TableModelName}, refreshCache } from "@/api/{TableModelNameLowCase}/{TableModelNameLowCase}";
+import { listTestCat, getTestCat, delTestCat, addTestCat, updateTestCat, refreshCache } from "@/api/testcat/testcat";
 
 const { proxy } = getCurrentInstance();
 const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
@@ -149,7 +228,7 @@ const { queryParams, form, rules } = toRefs(data);
 /** 查询列表 */
 function getList() {
   loading.value = true;
-  list{TableModelName}(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
+  listTestCat(proxy.addDateRange(queryParams.value, dateRange.value)).then(response => {
     typeList.value = response.data;
     total.value = response.total;
     loading.value = false;
@@ -198,7 +277,7 @@ function handleSelectionChange(selection) {
 function handleUpdate(row) {
   reset();
   const dictId = row.dictId || ids.value;
-  get{TableModelName}(dictId).then(response => {
+  getTestCat(dictId).then(response => {
     form.value = response.data;
     open.value = true;
     title.value = "修改字典类型";
@@ -209,13 +288,13 @@ function submitForm() {
   proxy.$refs["dictRef"].validate(valid => {
     if (valid) {
       if (form.value.dictId != undefined) {
-        update{TableModelName}(form.value).then(response => {
+        updateTestCat(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
           getList();
         });
       } else {
-        add{TableModelName}(form.value).then(response => {
+        addTestCat(form.value).then(response => {
           proxy.$modal.msgSuccess("新增成功");
           open.value = false;
           getList();
@@ -228,7 +307,7 @@ function submitForm() {
 function handleDelete(row) {
   const dictIds = row.dictId || ids.value;
   proxy.$modal.confirm('是否确认删除字典编号为"' + dictIds + '"的数据项？').then(function() {
-    return del{TableModelName}(dictIds);
+    return delTestCat(dictIds);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");

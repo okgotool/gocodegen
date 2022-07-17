@@ -9,5 +9,6 @@ type (
 		Code StatusCode       `json:"code"`
 		Msg  string           `json:"msg"`
 		Data []*model.TestCat `json:"data"`
+		Total int64            `json:"total"`
 	}
 )

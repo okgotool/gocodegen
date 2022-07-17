@@ -57,7 +57,7 @@ func (c *SysRoleServiceType) GetOrderByExpr(orderBy string) ([]field.Expr, error
 }
 
 // 查询所有,limits<0 时无限制
-func (c *SysRoleServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.SysRole, error) {
+func (c *SysRoleServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.SysRole, int64, error) {
 	if len(orderBys) < 1 {
 		orderBys = []field.Expr{SysRoleDao.ID.Desc()}
 	}
@@ -76,9 +76,10 @@ func (c *SysRoleServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr
 	for _, orderBy := range orderBys {
 		tx = tx.Order(orderBy)
 	}
+	total, _ := tx.Count()
 	rs, err := tx.Offset(offset).Limit(pageSize).Find()
 
-	return rs, err
+	return rs, total, err
 }
 
 // 按id查询一个

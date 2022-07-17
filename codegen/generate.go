@@ -60,10 +60,16 @@ func StartGenConfig(config *GenConfig) {
 	GenerateAutomigrate(config, dbModels)
 
 	GenerateDataSources(config)
+
+	RuoyiVue3Gen.GenTopMenusSql(config)
+	RuoyiVue3Gen.GenChildMenusSql(config, dbModels)
+
 	for _, model := range dbModels {
 		GenerateBizCode(config, model)
 		GenerateApis(config, model)
 		VueElementAdminGen.GenerateVueCodes(config, model)
+
+		RuoyiVue3Gen.GenerateRuoyiVue3Codes(config, model)
 	}
 	VueElementAdminGen.GenerateVueRouter(config, dbModels)
 }
@@ -138,6 +144,7 @@ func getDbTableModels(config *GenConfig) []*DbModel {
 						TableName:              modelTableName,
 						StructName:             modelStructName,
 						PrivatePropertyName:    strings.ToLower(string(modelStructName[0])) + modelStructName[1:],
+						PathName:               strings.ToLower(modelStructName),
 						Fields:                 modelFields,
 						PrimaryKeyPropertyName: primaryKeyPropertyName,
 					}

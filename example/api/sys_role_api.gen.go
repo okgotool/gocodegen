@@ -53,7 +53,7 @@ func (c *SysRoleApiType) QueryAll(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.SysRoleService.QueryAll(nil, orderBys, page, pageSize)
+	rs, total, err := biz.SysRoleService.QueryAll(nil, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -66,6 +66,7 @@ func (c *SysRoleApiType) QueryAll(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total,
 		})
 	}
 }
@@ -277,7 +278,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.SysRoleService.QueryAll(whereConditions, orderBys, page, pageSize)
+	rs, total, err := biz.SysRoleService.QueryAll(whereConditions, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -290,6 +291,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total, 
 		})
 	}
 }

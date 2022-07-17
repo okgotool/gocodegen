@@ -53,7 +53,7 @@ func (c *TestCatApiType) QueryAll(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.TestCatService.QueryAll(nil, orderBys, page, pageSize)
+	rs, total, err := biz.TestCatService.QueryAll(nil, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -66,6 +66,7 @@ func (c *TestCatApiType) QueryAll(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total,
 		})
 	}
 }
@@ -173,7 +174,7 @@ func (c *TestCatApiType) QueryByCondition(g *gin.Context) {
 		return
 	}
 
-	rs, err := biz.TestCatService.QueryAll(whereConditions, orderBys, page, pageSize)
+	rs, total, err := biz.TestCatService.QueryAll(whereConditions, orderBys, page, pageSize)
 
 	if err != nil {
 		g.JSON(response.FailedCode, &response.FailedWithReason{
@@ -186,6 +187,7 @@ func (c *TestCatApiType) QueryByCondition(g *gin.Context) {
 			Code: response.StatusOK,
 			Msg:  "ok",
 			Data: rs,
+			Total: total, 
 		})
 	}
 }

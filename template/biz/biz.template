@@ -57,7 +57,7 @@ func (c *{TableModelName}ServiceType) GetOrderByExpr(orderBy string) ([]field.Ex
 }
 
 // 查询所有,limits<0 时无限制
-func (c *{TableModelName}ServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.{TableModelName}, error) {
+func (c *{TableModelName}ServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.{TableModelName}, int64, error) {
 	if len(orderBys) < 1 {
 		orderBys = []field.Expr{{TableModelName}Dao.{PrimaryKeyPropertyName}.Desc()}
 	}
@@ -76,9 +76,10 @@ func (c *{TableModelName}ServiceType) QueryAll(wheres []field.Expr, orderBys []f
 	for _, orderBy := range orderBys {
 		tx = tx.Order(orderBy)
 	}
+	total, _ := tx.Count()
 	rs, err := tx.Offset(offset).Limit(pageSize).Find()
 
-	return rs, err
+	return rs, total, err
 }
 
 // 按id查询一个

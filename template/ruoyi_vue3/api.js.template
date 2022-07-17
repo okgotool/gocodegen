@@ -1,5 +1,7 @@
 import request from '@/utils/request'
 
+// Api详情：http://server_ip:port/swagger/index.html#/{TableModelName}
+
 // 查询列表
 export function list{TableModelName}(query) {
   return request({

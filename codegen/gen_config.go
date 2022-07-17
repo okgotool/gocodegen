@@ -41,8 +41,17 @@ type (
 	}
 
 	GenConfigGenRuoyiVue3 struct {
-		Enable      bool   `yaml:"enable"`
-		ProjectRoot string `yaml:"projectRoot"`
+		Enable      bool                        `yaml:"enable"`
+		ProjectRoot string                      `yaml:"projectRoot"`
+		TopMenus    []*GenConfigGenRuoyiVueMenu `yaml:"topMenus"`
+	}
+
+	GenConfigGenRuoyiVueMenu struct {
+		Name       string                      `yaml:"name"`
+		Path       string                      `yaml:"path"`
+		Icon       string                      `yaml:"icon"`
+		OrderNum   string                      `yaml:"orderNum"`
+		ChildMenus []*GenConfigGenRuoyiVueMenu `yaml:"childMenus"`
 	}
 
 	GenConfigGenVueElementAdmin struct {
@@ -87,6 +96,7 @@ type (
 		Fields         []*GenConfigField `yaml:"fields"`
 		GenApis        []string          `yaml:"genApis"`
 		ParentMenu     string            `yaml:"parentMenu"`
+		MenuName       string            `yaml:"menuName"`
 	}
 
 	GenConfigField struct {

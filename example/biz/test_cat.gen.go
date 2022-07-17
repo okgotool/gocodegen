@@ -57,7 +57,7 @@ func (c *TestCatServiceType) GetOrderByExpr(orderBy string) ([]field.Expr, error
 }
 
 // 查询所有,limits<0 时无限制
-func (c *TestCatServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.TestCat, error) {
+func (c *TestCatServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr, page int, pageSize int) ([]*model.TestCat, int64, error) {
 	if len(orderBys) < 1 {
 		orderBys = []field.Expr{TestCatDao.ID.Desc()}
 	}
@@ -76,9 +76,10 @@ func (c *TestCatServiceType) QueryAll(wheres []field.Expr, orderBys []field.Expr
 	for _, orderBy := range orderBys {
 		tx = tx.Order(orderBy)
 	}
+	total, _ := tx.Count()
 	rs, err := tx.Offset(offset).Limit(pageSize).Find()
 
-	return rs, err
+	return rs, total, err
 }
 
 // 按id查询一个
