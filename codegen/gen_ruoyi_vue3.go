@@ -126,6 +126,7 @@ func (v *RuoyiVue3GenType) GenVueViews(config *GenConfig, model *DbModel) {
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{LowerFirstCharTableModelName}", model.PrivatePropertyName, -1)
 	templateCodes = strings.Replace(templateCodes, "{TableModelNameLowCase}", model.PathName, -1)
+	templateCodes = strings.Replace(templateCodes, "{PrimaryKeyPropertyName}", model.PrimaryKeyPropertyName, -1)
 
 	// search view:
 	searchCodes := ""

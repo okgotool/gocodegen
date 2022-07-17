@@ -147,7 +147,7 @@
                plain
                icon="Plus"
                @click="handleAdd"
-               v-hasPermi="['system:dict:add']"
+               v-hasPermi="['system:sysrole:add']"
             >新增</el-button>
          </el-col>
          <el-col :span="1.5">
@@ -157,7 +157,7 @@
                icon="Edit"
                :disabled="single"
                @click="handleUpdate"
-               v-hasPermi="['system:dict:edit']"
+               v-hasPermi="['system:sysrole:edit']"
             >修改</el-button>
          </el-col>
          <el-col :span="1.5">
@@ -167,7 +167,7 @@
                icon="Delete"
                :disabled="multiple"
                @click="handleDelete"
-               v-hasPermi="['system:dict:remove']"
+               v-hasPermi="['system:sysrole:remove']"
             >删除</el-button>
          </el-col>
          <!--
@@ -177,19 +177,20 @@
                plain
                icon="Download"
                @click="handleExport"
-               v-hasPermi="['system:dict:export']"
+               v-hasPermi="['system:sysrole:export']"
             >导出</el-button>
          </el-col>
-         -->
+         
          <el-col :span="1.5">
             <el-button
                type="danger"
                plain
                icon="Refresh"
                @click="handleRefreshCache"
-               v-hasPermi="['system:dict:remove']"
+               v-hasPermi="['system:sysrole:remove']"
             >刷新缓存</el-button>
          </el-col>
+         -->
          <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
       </el-row>
 
@@ -234,13 +235,13 @@
                   type="text"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
-                  v-hasPermi="['system:dict:edit']"
+                  v-hasPermi="['system:sysrole:edit']"
                >修改</el-button>
                <el-button
                   type="text"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
-                  v-hasPermi="['system:dict:remove']"
+                  v-hasPermi="['system:sysrole:remove']"
                >删除</el-button>
             </template>
          </el-table-column>
@@ -249,14 +250,14 @@
       <pagination
          v-show="total > 0"
          :total="total"
-         v-model:page="queryParams.pageNum"
+         v-model:page="queryParams.page"
          v-model:limit="queryParams.pageSize"
          @pagination="getList"
       />
 
       <!-- 添加或修改参数配置对话框 -->
       <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-         <el-form ref="dictRef" :model="form" :rules="rules" label-width="80px">
+         <el-form ref="sysRoleRef" :model="form" :rules="rules" label-width="80px">
 
         <el-form-item label="RoleName" prop="roleName">
           <el-input v-model="form.roleName" placeholder="请输入RoleName" />
@@ -298,11 +299,10 @@
    </div>
 </template>
 
-<script setup name="Dict">
-import { listSysRole, getSysRole, delSysRole, addSysRole, updateSysRole, refreshCache } from "@/api/sysrole/sysrole";
+<script setup name="SysRole">
+import { listSysRole, getSysRole, delSysRole, addSysRole, updateSysRole } from "@/api/sysrole/sysrole";
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
 const typeList = ref([]);
 const open = ref(false);
@@ -320,14 +320,28 @@ const data = reactive({
   queryParams: {
     page: 1,
     pageSize: 10,
-    // {}
+            id: undefined,
+        roleName: undefined,
+        roleNameEn: undefined,
+        status: undefined,
+        priority: undefined,
+        comment: undefined,
+        deleted: undefined,
+        lastmodifiedBy: undefined,
+        lastmodified: undefined,
+        createdBy: undefined,
+        created: undefined,
+        createdAt: undefined,
+        updatedBy: undefined,
+        updatedAt: undefined,
+
    //  dictName: undefined,
    //  dictType: undefined,
    //  status: undefined
   },
 //   rules: {
 //     dictName: [{ required: true, message: "字典名称不能为空", trigger: "blur" }],
-//     dictType: [{ required: true, message: "字典类型不能为空", trigger: "blur" }]
+//     dictType: [{ required: true, message: "SysRole不能为空", trigger: "blur" }]
 //   },
 });
 
@@ -350,17 +364,32 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    dictId: undefined,
-    dictName: undefined,
-    dictType: undefined,
+   //  ID: undefined,
+   //  dictName: undefined,
+   //  dictType: undefined,
+           id: undefined,
+        roleName: undefined,
+        roleNameEn: undefined,
+        status: undefined,
+        priority: undefined,
+        comment: undefined,
+        deleted: undefined,
+        lastmodifiedBy: undefined,
+        lastmodified: undefined,
+        createdBy: undefined,
+        created: undefined,
+        createdAt: undefined,
+        updatedBy: undefined,
+        updatedAt: undefined,
+
     status: "0",
     remark: undefined
   };
-  proxy.resetForm("dictRef");
+  proxy.resetForm("sysRoleRef");
 }
 /** 搜索按钮操作 */
 function handleQuery() {
-  queryParams.value.pageNum = 1;
+  queryParams.value.page = 1;
   getList();
 }
 /** 重置按钮操作 */
@@ -373,29 +402,29 @@ function resetQuery() {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加字典类型";
+  title.value = "添加SysRole";
 }
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.dictId);
+  ids.value = selection.map(item => item.ID);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const dictId = row.dictId || ids.value;
-  getSysRole(dictId).then(response => {
+  const ID = row.ID || ids.value;
+  getSysRole(ID).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改字典类型";
+    title.value = "修改SysRole";
   });
 }
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["dictRef"].validate(valid => {
+  proxy.$refs["sysRoleRef"].validate(valid => {
     if (valid) {
-      if (form.value.dictId != undefined) {
+      if (form.value.ID != undefined) {
         updateSysRole(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -413,9 +442,9 @@ function submitForm() {
 }
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const dictIds = row.dictId || ids.value;
-  proxy.$modal.confirm('是否确认删除字典编号为"' + dictIds + '"的数据项？').then(function() {
-    return delSysRole(dictIds);
+  const IDs = row.ID || ids.value;
+  proxy.$modal.confirm('是否确认删除ID为"' + IDs + '"的数据项？').then(function() {
+    return delSysRole(IDs);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -430,11 +459,11 @@ function handleDelete(row) {
 // }
 
 /** 刷新缓存按钮操作 */
-function handleRefreshCache() {
-  refreshCache().then(() => {
-    proxy.$modal.msgSuccess("刷新成功");
-  });
-}
+// function handleRefreshCache() {
+//   refreshCache().then(() => {
+//     proxy.$modal.msgSuccess("刷新成功");
+//   });
+// }
 
 getList();
 </script>

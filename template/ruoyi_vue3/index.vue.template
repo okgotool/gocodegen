@@ -17,7 +17,7 @@
                plain
                icon="Plus"
                @click="handleAdd"
-               v-hasPermi="['system:dict:add']"
+               v-hasPermi="['system:{TableModelNameLowCase}:add']"
             >新增</el-button>
          </el-col>
          <el-col :span="1.5">
@@ -27,7 +27,7 @@
                icon="Edit"
                :disabled="single"
                @click="handleUpdate"
-               v-hasPermi="['system:dict:edit']"
+               v-hasPermi="['system:{TableModelNameLowCase}:edit']"
             >修改</el-button>
          </el-col>
          <el-col :span="1.5">
@@ -37,7 +37,7 @@
                icon="Delete"
                :disabled="multiple"
                @click="handleDelete"
-               v-hasPermi="['system:dict:remove']"
+               v-hasPermi="['system:{TableModelNameLowCase}:remove']"
             >删除</el-button>
          </el-col>
          <!--
@@ -47,19 +47,20 @@
                plain
                icon="Download"
                @click="handleExport"
-               v-hasPermi="['system:dict:export']"
+               v-hasPermi="['system:{TableModelNameLowCase}:export']"
             >导出</el-button>
          </el-col>
-         -->
+         
          <el-col :span="1.5">
             <el-button
                type="danger"
                plain
                icon="Refresh"
                @click="handleRefreshCache"
-               v-hasPermi="['system:dict:remove']"
+               v-hasPermi="['system:{TableModelNameLowCase}:remove']"
             >刷新缓存</el-button>
          </el-col>
+         -->
          <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
       </el-row>
 
@@ -74,13 +75,13 @@
                   type="text"
                   icon="Edit"
                   @click="handleUpdate(scope.row)"
-                  v-hasPermi="['system:dict:edit']"
+                  v-hasPermi="['system:{TableModelNameLowCase}:edit']"
                >修改</el-button>
                <el-button
                   type="text"
                   icon="Delete"
                   @click="handleDelete(scope.row)"
-                  v-hasPermi="['system:dict:remove']"
+                  v-hasPermi="['system:{TableModelNameLowCase}:remove']"
                >删除</el-button>
             </template>
          </el-table-column>
@@ -89,14 +90,14 @@
       <pagination
          v-show="total > 0"
          :total="total"
-         v-model:page="queryParams.pageNum"
+         v-model:page="queryParams.page"
          v-model:limit="queryParams.pageSize"
          @pagination="getList"
       />
 
       <!-- 添加或修改参数配置对话框 -->
       <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-         <el-form ref="dictRef" :model="form" :rules="rules" label-width="80px">
+         <el-form ref="{LowerFirstCharTableModelName}Ref" :model="form" :rules="rules" label-width="80px">
 
 <!-- {ModelEditFormItems} -->
 
@@ -111,11 +112,10 @@
    </div>
 </template>
 
-<script setup name="Dict">
-import { list{TableModelName}, get{TableModelName}, del{TableModelName}, add{TableModelName}, update{TableModelName}, refreshCache } from "@/api/{TableModelNameLowCase}/{TableModelNameLowCase}";
+<script setup name="{TableModelName}">
+import { list{TableModelName}, get{TableModelName}, del{TableModelName}, add{TableModelName}, update{TableModelName} } from "@/api/{TableModelNameLowCase}/{TableModelNameLowCase}";
 
 const { proxy } = getCurrentInstance();
-const { sys_normal_disable } = proxy.useDict("sys_normal_disable");
 
 const typeList = ref([]);
 const open = ref(false);
@@ -133,14 +133,14 @@ const data = reactive({
   queryParams: {
     page: 1,
     pageSize: 10,
-    // {}
+    // {ModelQueryParamNames}
    //  dictName: undefined,
    //  dictType: undefined,
    //  status: undefined
   },
 //   rules: {
 //     dictName: [{ required: true, message: "字典名称不能为空", trigger: "blur" }],
-//     dictType: [{ required: true, message: "字典类型不能为空", trigger: "blur" }]
+//     dictType: [{ required: true, message: "{TableModelName}不能为空", trigger: "blur" }]
 //   },
 });
 
@@ -163,17 +163,18 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-    dictId: undefined,
-    dictName: undefined,
-    dictType: undefined,
+   //  {PrimaryKeyPropertyName}: undefined,
+   //  dictName: undefined,
+   //  dictType: undefined,
+   // {ModelQueryParamNames}
     status: "0",
     remark: undefined
   };
-  proxy.resetForm("dictRef");
+  proxy.resetForm("{LowerFirstCharTableModelName}Ref");
 }
 /** 搜索按钮操作 */
 function handleQuery() {
-  queryParams.value.pageNum = 1;
+  queryParams.value.page = 1;
   getList();
 }
 /** 重置按钮操作 */
@@ -186,29 +187,29 @@ function resetQuery() {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加字典类型";
+  title.value = "添加{TableModelName}";
 }
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.dictId);
+  ids.value = selection.map(item => item.{PrimaryKeyPropertyName});
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const dictId = row.dictId || ids.value;
-  get{TableModelName}(dictId).then(response => {
+  const {PrimaryKeyPropertyName} = row.{PrimaryKeyPropertyName} || ids.value;
+  get{TableModelName}({PrimaryKeyPropertyName}).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改字典类型";
+    title.value = "修改{TableModelName}";
   });
 }
 /** 提交按钮 */
 function submitForm() {
-  proxy.$refs["dictRef"].validate(valid => {
+  proxy.$refs["{LowerFirstCharTableModelName}Ref"].validate(valid => {
     if (valid) {
-      if (form.value.dictId != undefined) {
+      if (form.value.{PrimaryKeyPropertyName} != undefined) {
         update{TableModelName}(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -226,9 +227,9 @@ function submitForm() {
 }
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const dictIds = row.dictId || ids.value;
-  proxy.$modal.confirm('是否确认删除字典编号为"' + dictIds + '"的数据项？').then(function() {
-    return del{TableModelName}(dictIds);
+  const {PrimaryKeyPropertyName}s = row.{PrimaryKeyPropertyName} || ids.value;
+  proxy.$modal.confirm('是否确认删除ID为"' + {PrimaryKeyPropertyName}s + '"的数据项？').then(function() {
+    return del{TableModelName}({PrimaryKeyPropertyName}s);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");
@@ -243,11 +244,11 @@ function handleDelete(row) {
 // }
 
 /** 刷新缓存按钮操作 */
-function handleRefreshCache() {
-  refreshCache().then(() => {
-    proxy.$modal.msgSuccess("刷新成功");
-  });
-}
+// function handleRefreshCache() {
+//   refreshCache().then(() => {
+//     proxy.$modal.msgSuccess("刷新成功");
+//   });
+// }
 
 getList();
 </script>
