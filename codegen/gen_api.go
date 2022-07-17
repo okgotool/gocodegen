@@ -151,9 +151,9 @@ func getApiIntQueryCondition(paramName string, modelName string, modelFieldName 
 
 	// for uint and  int:
 	if strings.HasPrefix(strings.ToLower(fieldType), "uint") {
-		str += "\t\t\t\tqueryValue, err := strconv.ParseUint(queryStr, 10, 64)\n"
+		str += "\t\t\t\tqueryValue, err := parseUint64(queryStr)\n"
 	} else {
-		str += "\t\t\t\tqueryValue, err := strconv.ParseInt(queryStr, 10, 64)\n"
+		str += "\t\t\t\tqueryValue, err := parseInt64(queryStr)\n"
 	}
 
 	str += "\t\t\t\tif err != nil {\n"

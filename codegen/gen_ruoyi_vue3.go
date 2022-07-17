@@ -69,7 +69,8 @@ func (v *RuoyiVue3GenType) GenChildMenusSql(config *GenConfig, models []*DbModel
 			sqlCodes += "--- Menu: " + table.ParentMenu + "/" + menuName + "\n"
 			sqlCodes += "SELECT menu_id,path into @" + menuPath + "_parent_menu_id,@" + menuPath + "_parent_menu_path FROM sys_menu where parent_id=0 and menu_name='" + table.ParentMenu + "';\n"
 			sqlCodes += insertColumnsSql
-			sqlCodes += " values('" + menuName + "', @" + menuPath + "_parent_menu_id, '1', '" + menuPath + "', concat(@" + menuPath + "_parent_menu_path,'/sysrole/index'), 1, 0, 'C', '0', '0', '', 'guide', 'admin', sysdate(), '', null, '" + menuName + "');\n"
+			// sqlCodes += " values('" + menuName + "', @" + menuPath + "_parent_menu_id, '1', '" + menuPath + "', concat(@" + menuPath + "_parent_menu_path,'/" + menuPath + "/index'), 1, 0, 'C', '0', '0', '', 'guide', 'admin', sysdate(), '', null, '" + menuName + "');\n"
+			sqlCodes += " values('" + menuName + "', @" + menuPath + "_parent_menu_id, '1', '" + menuPath + "', '" + menuPath + "/index', 1, 0, 'C', '0', '0', '', 'guide', 'admin', sysdate(), '', null, '" + menuName + "');\n"
 
 			break
 		}
@@ -126,7 +127,14 @@ func (v *RuoyiVue3GenType) GenVueViews(config *GenConfig, model *DbModel) {
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{LowerFirstCharTableModelName}", model.PrivatePropertyName, -1)
 	templateCodes = strings.Replace(templateCodes, "{TableModelNameLowCase}", model.PathName, -1)
-	templateCodes = strings.Replace(templateCodes, "{PrimaryKeyPropertyName}", model.PrimaryKeyPropertyName, -1)
+
+	primaryKey := model.PrimaryKeyPropertyName
+	if strings.EqualFold(primaryKey, "ID") {
+		primaryKey = "id"
+	} else {
+		primaryKey = strings.ToLower(string(primaryKey[0])) + primaryKey[1:]
+	}
+	templateCodes = strings.Replace(templateCodes, "{PrimaryKeyPropertyName}", primaryKey, -1)
 
 	// search view:
 	searchCodes := ""

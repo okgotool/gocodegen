@@ -99,7 +99,7 @@ func (c *{TableModelName}ApiType) QueryByCondition(g *gin.Context) {
 	}
 
 	if len(idStr) > 0 && !strings.EqualFold(idStr, "0") { // 按id查询
-		id, err := strconv.ParseInt(idStr, 10, 64)
+		id, err := parseInt64(idStr)
 		if err != nil {
 			errMsgs["id"] = err.Error()
 		} else {
