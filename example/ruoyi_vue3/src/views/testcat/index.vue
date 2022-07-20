@@ -248,7 +248,7 @@ function cancel() {
 /** 表单重置 */
 function reset() {
   form.value = {
-   //  ID: undefined,
+   //  id: undefined,
    //  dictName: undefined,
    //  dictType: undefined,
            id: undefined,
@@ -282,15 +282,15 @@ function handleAdd() {
 }
 /** 多选框选中数据 */
 function handleSelectionChange(selection) {
-  ids.value = selection.map(item => item.ID);
+  ids.value = selection.map(item => item.id);
   single.value = selection.length != 1;
   multiple.value = !selection.length;
 }
 /** 修改按钮操作 */
 function handleUpdate(row) {
   reset();
-  const ID = row.ID || ids.value;
-  getTestCat(ID).then(response => {
+  const id = row.id || ids.value;
+  getTestCat(id).then(response => {
     form.value = response.data;
     open.value = true;
     title.value = "修改TestCat";
@@ -300,7 +300,7 @@ function handleUpdate(row) {
 function submitForm() {
   proxy.$refs["testCatRef"].validate(valid => {
     if (valid) {
-      if (form.value.ID != undefined) {
+      if (form.value.id != undefined) {
         updateTestCat(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功");
           open.value = false;
@@ -318,9 +318,9 @@ function submitForm() {
 }
 /** 删除按钮操作 */
 function handleDelete(row) {
-  const IDs = row.ID || ids.value;
-  proxy.$modal.confirm('是否确认删除ID为"' + IDs + '"的数据项？').then(function() {
-    return delTestCat(IDs);
+  const ids = row.id || ids.value;
+  proxy.$modal.confirm('是否确认删除ID为"' + ids + '"的数据项？').then(function() {
+    return delTestCat(ids);
   }).then(() => {
     getList();
     proxy.$modal.msgSuccess("删除成功");

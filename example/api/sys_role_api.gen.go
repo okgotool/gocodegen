@@ -116,7 +116,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 	}
 
 	if len(idStr) > 0 && !strings.EqualFold(idStr, "0") { // 按id查询
-		id, err := strconv.ParseInt(idStr, 10, 64)
+		id, err := parseInt64(idStr)
 		if err != nil {
 			errMsgs["id"] = err.Error()
 		} else {
@@ -138,7 +138,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("status"), ",")
 			for _, queryStr := range queryStrs {
-				queryValue, err := strconv.ParseInt(queryStr, 10, 64)
+				queryValue, err := parseInt64(queryStr)
 				if err != nil {
 				} else {
 					queryValues = append(queryValues, int32(queryValue))
@@ -154,7 +154,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("priority"), ",")
 			for _, queryStr := range queryStrs {
-				queryValue, err := strconv.ParseInt(queryStr, 10, 64)
+				queryValue, err := parseInt64(queryStr)
 				if err != nil {
 				} else {
 					queryValues = append(queryValues, int32(queryValue))
@@ -174,7 +174,7 @@ func (c *SysRoleApiType) QueryByCondition(g *gin.Context) {
 			queryValues := []int32{}
 			queryStrs := strings.Split(g.Query("deleted"), ",")
 			for _, queryStr := range queryStrs {
-				queryValue, err := strconv.ParseInt(queryStr, 10, 64)
+				queryValue, err := parseInt64(queryStr)
 				if err != nil {
 				} else {
 					queryValues = append(queryValues, int32(queryValue))
