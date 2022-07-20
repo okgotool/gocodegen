@@ -222,7 +222,7 @@ func generateApiRouterCode(config *GenConfig, tableName string, modelName string
 	// add main add api method if not exist:
 	if !strings.Contains(codes, "func AddApis(api *gin.RouterGroup)") {
 		codes += "func AddApis(api *gin.RouterGroup) {\n"
-		codes += "\tv1 := api.Group(\"v1\")\n\n"
+		codes += "\tv1 := api.Group(\"" + config.Gen.GenApi.ApiGroup + "\")\n\n"
 		codes += "\t// {otherApisPlaceHolder}\n\n"
 		codes += "}\n"
 	}

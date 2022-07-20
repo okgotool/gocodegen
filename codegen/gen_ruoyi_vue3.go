@@ -111,6 +111,11 @@ func (v *RuoyiVue3GenType) GenApiJs(config *GenConfig, model *DbModel) {
 
 	templateCodes = strings.Replace(templateCodes, "{TableModelName}", model.StructName, -1)
 	templateCodes = strings.Replace(templateCodes, "{TableModelNameLowCase}", model.PathName, -1)
+	apiRouterRoot := ""
+	if len(config.Gen.GenRuoyiVue3.ApiProxyServiceName) > 0 {
+		apiRouterRoot = "/" + config.Gen.GenRuoyiVue3.ApiProxyServiceName
+	}
+	templateCodes = strings.Replace(templateCodes, "{ApiRouterRoot}", apiRouterRoot, -1)
 
 	// queryParams := v.getVueQueryParameters(model)
 	// templateCodes = strings.Replace(templateCodes, "// {其它查询参数}", queryParams, -1)

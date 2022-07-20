@@ -41,9 +41,10 @@ type (
 	}
 
 	GenConfigGenRuoyiVue3 struct {
-		Enable      bool                        `yaml:"enable"`
-		ProjectRoot string                      `yaml:"projectRoot"`
-		TopMenus    []*GenConfigGenRuoyiVueMenu `yaml:"topMenus"`
+		Enable              bool                        `yaml:"enable"`
+		ProjectRoot         string                      `yaml:"projectRoot"`
+		ApiProxyServiceName string                      `yaml:"apiProxyServiceName"`
+		TopMenus            []*GenConfigGenRuoyiVueMenu `yaml:"topMenus"`
 	}
 
 	GenConfigGenRuoyiVueMenu struct {

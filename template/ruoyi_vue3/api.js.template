@@ -5,7 +5,7 @@ import request from '@/utils/request'
 // 查询列表
 export function list{TableModelName}(query) {
   return request({
-    url: '/api/v1/{TableModelNameLowCase}s',
+    url: '{ApiRouterRoot}/api/v1/{TableModelNameLowCase}s',
     method: 'get',
     params: query
   })
@@ -14,7 +14,7 @@ export function list{TableModelName}(query) {
 // 按ID查询详细
 export function get{TableModelName}(id) {
   return request({
-    url: '/api/v1/{TableModelNameLowCase}s?id=' + id,
+    url: '{ApiRouterRoot}/api/v1/{TableModelNameLowCase}s?id=' + id,
     method: 'get'
   })
 }
@@ -22,7 +22,7 @@ export function get{TableModelName}(id) {
 // 新增
 export function add{TableModelName}(data) {
   return request({
-    url: '/api/v1/{TableModelNameLowCase}',
+    url: '{ApiRouterRoot}/api/v1/{TableModelNameLowCase}',
     method: 'post',
     data: data
   })
@@ -31,7 +31,7 @@ export function add{TableModelName}(data) {
 // 修改
 export function update{TableModelName}(data) {
   return request({
-    url: '/api/v1/{TableModelNameLowCase}',
+    url: '{ApiRouterRoot}/api/v1/{TableModelNameLowCase}',
     method: 'put',
     data: data
   })
@@ -40,7 +40,7 @@ export function update{TableModelName}(data) {
 // 删除
 export function del{TableModelName}(id) {
   return request({
-    url: '/api/v1/{TableModelNameLowCase}s?id=' + id,
+    url: '{ApiRouterRoot}/api/v1/{TableModelNameLowCase}s?id=' + id,
     method: 'delete'
   })
 }

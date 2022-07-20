@@ -59,6 +59,7 @@ gen:
   genRuoyiVue3: # 生成Ruoyi vue3代码的配置
     enable: true  # 是否开启
     projectRoot: ./example/ruoyi_vue3 # Ruoyi vue3代码生成的根目录，将按结构生成代码
+    apiProxyServiceName: gobe # Vue api proxy service name, configured in vite.onfig.js: server/proxy, will add it in the front of the api
     topMenus: # 一级菜单
       - name: 管理首页
         path: dashboard
